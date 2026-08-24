@@ -134,6 +134,20 @@ class RunContext:
         self.logger.info("Wrote artifact %s", filename)
         return artifact_path
 
+    def register_artifact(self, filename: str) -> Path:
+        """Register an existing plain-basename artifact inside this run directory."""
+
+        path = Path(filename)
+        if path.name != filename:
+            raise ValueError("Artifact filename must be a plain basename.")
+        artifact_path = self.run_dir / filename
+        if not artifact_path.is_file():
+            raise FileNotFoundError(f"Artifact does not exist: {artifact_path}")
+        self.manifest.setdefault("artifacts", {})[filename] = filename
+        _atomic_write_json(self.manifest_path, self.manifest)
+        self.logger.info("Registered artifact %s", filename)
+        return artifact_path
+
     def record_metrics(self, metrics: Mapping[str, Any]) -> None:
         normalized = dict(metrics)
         json.dumps(normalized, allow_nan=False)
@@ -146,7 +160,9 @@ class RunContext:
     def __exit__(self, exc_type: object, exc: BaseException | None, traceback: object) -> bool:
         if self._closed:
             return False
-        self.manifest["finished_at_utc"] = _utc_now().isoformat()
+        completed_at = _utc_now().isoformat()
+        self.manifest["finished_at_utc"] = completed_at
+        self.manifest["completed_at"] = completed_at
         if exc is None:
             self.manifest["status"] = "completed"
             self.logger.info("Run completed successfully")
@@ -212,7 +228,9 @@ def start_run(
             "run_id": run_id,
             "status": "started",
             "started_at_utc": timestamp.isoformat(),
+            "started_at": timestamp.isoformat(),
             "finished_at_utc": None,
+            "completed_at": None,
             "config_sha256": config.source_sha256,
             "git_commit": environment["git"]["commit"],
             "git_branch": environment["git"]["branch"],

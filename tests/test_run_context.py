@@ -34,11 +34,15 @@ def test_run_context_writes_and_finalizes_artifacts(tmp_path: Path) -> None:
 
     with start_run(config, project_root=tmp_path) as run:
         run.write_json_artifact("result.json", {"ok": True})
+        (run.run_dir / "table.csv").write_text("id\n1\n", encoding="utf-8")
+        run.register_artifact("table.csv")
         run.record_metrics({"accuracy": 1.0})
         run_dir = run.run_dir
 
     manifest = json.loads((run_dir / "run_manifest.json").read_text(encoding="utf-8"))
     assert manifest["status"] == "completed"
+    assert manifest["started_at"] is not None
+    assert manifest["completed_at"] is not None
     assert manifest["experiment_id"] == "unit_test"
     assert manifest["git_commit"] is None
     assert manifest["metrics"]["accuracy"] == 1.0
@@ -46,6 +50,7 @@ def test_run_context_writes_and_finalizes_artifacts(tmp_path: Path) -> None:
     assert (run_dir / "environment.json").is_file()
     assert (run_dir / "run.log").is_file()
     assert (run_dir / "result.json").is_file()
+    assert manifest["artifacts"]["table.csv"] == "table.csv"
 
 
 def test_run_context_records_failure(tmp_path: Path) -> None:

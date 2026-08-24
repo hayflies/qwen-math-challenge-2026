@@ -1,0 +1,73 @@
+schema_version: 1
+
+experiment:
+  experiment_id: E000
+  phase: 3
+  model: Qwen/Qwen2.5-3B-Instruct
+  checkpoint: Qwen/Qwen2.5-3B-Instruct@main
+  dataset_version: official_v001
+  train_samples: 0
+  validation_split: official_v001_split_v001
+  external_datasets: []
+  seed: 2026
+  learning_rate: null
+  epochs: null
+  batch_size: 1
+  gradient_accumulation: null
+  max_length: null
+  lora_config: null
+  prompt_template: zero_shot_v001
+  inference_config: greedy_v001
+  parser_version: integer_v001
+  local_validation_score: null
+  per_category_scores: {}
+  leaderboard_score: null
+  notes: "Canonical Qwen2.5-3B-Instruct zero-shot greedy baseline; no training or tools."
+
+runtime:
+  output_root: outputs/e000_zero_shot
+  log_level: INFO
+  deterministic: true
+  device: auto
+  dtype: auto
+  batch_size: 1
+
+model:
+  name_or_path: Qwen/Qwen2.5-3B-Instruct
+  revision: main
+  tokenizer_revision: main
+  local_files_only: true
+  trust_remote_code: false
+
+data:
+  split_version: official_v001_split_v001
+  validation_path: data/splits/official_v001/val.csv
+  validation_sha256: cbf48fc75ed858795fa99cf15bd9de736465ba590d5752784af7de6b13c5a40c
+  validation_rows: 1637
+  groups_path: data/splits/official_v001/groups.csv
+  groups_sha256: 7f0f0376d8e2f12a67ff959bfa183518fd4ba2214e18076e2e7363073e7ff566
+
+prompt:
+  version: zero_shot_v001
+  system_text: >-
+    You solve math problems. End your response with the final answer as an integer.
+  user_template: |-
+    {question}
+
+    Solve the problem and end with: Final answer: <integer>
+
+generation:
+  version: greedy_v001
+  do_sample: false
+  num_beams: 1
+  max_new_tokens: 1024
+  use_cache: true
+
+parser:
+  version: integer_v001
+
+output:
+  predictions_filename: predictions.csv
+  failures_filename: failures.csv
+  metrics_filename: metrics.json
+  resume_identity_filename: resume_identity.json

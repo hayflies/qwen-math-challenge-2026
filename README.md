@@ -5,8 +5,8 @@
 기준은 루트의 `AGENTS.md`다.
 
 현재 구현 범위는 **Phase 0 — 프로젝트 기반 및 재현성**, **Phase 1 — 공식 데이터 감사 및
-정제**, **Phase 2 — leakage-safe 내부 validation 구축**이다. 모델 로드, 학습, 평가,
-제출 생성 로직은 아직 구현하지 않는다.
+정제**, **Phase 2 — leakage-safe 내부 validation 구축**, **Phase 3 — E000 zero-shot
+평가**다. 학습과 제출 생성 로직은 아직 구현하지 않는다.
 
 ## 환경 준비
 
@@ -17,8 +17,8 @@ Python 3.11과 `uv`를 사용한다. 직접 의존성의 허용 범위는 `pypro
 uv sync --frozen --group dev
 ```
 
-Phase 0은 대형 학습 패키지를 설치하지 않는다. PyTorch, Transformers, PEFT 등은 실제로
-필요한 후속 Phase에서 실행 환경에 맞는 버전을 검증한 뒤 추가한다.
+Phase 3은 추론에 필요한 PyTorch, Transformers, Accelerate만 추가한다. PEFT, TRL,
+bitsandbytes, datasets, DeepSpeed는 아직 설치하지 않는다.
 
 ## 검증
 
@@ -84,3 +84,23 @@ uv run --frozen python scripts/create_split.py \
 `split_manifest.json`과 `split_report.json`은 추적한다. leaderboard는 exact/normalized
 overlap 감사에만 읽으며 train/validation에는 포함하지 않는다. derived category는 gold
 label이 아니므로 보고에만 사용하고 split 기준으로 사용하지 않는다.
+
+## Phase 3 E000 zero-shot 평가
+
+E000은 `Qwen/Qwen2.5-3B-Instruct`의 로컬 Hugging Face cache만 사용한다. 모델을 다른
+checkpoint로 대체하거나 실행 중 자동 다운로드하지 않는다. 다음 명령으로 5문항 smoke를 먼저
+실행한다.
+
+```bash
+uv run --frozen --no-sync python scripts/evaluate_zero_shot.py \
+  --config configs/inference/e000_zero_shot.yaml \
+  --limit 5
+```
+
+전체 validation은 `--limit`을 제거한다. 중단된 호환 run의 완료 prefix를 재사용하려면 새
+run을 만들면서 `--resume <prior-run-directory>`를 지정한다. model commit, split hash,
+prompt, generation config, parser, limit 또는 config hash가 다르면 resume을 거부한다.
+
+기본값은 공식 tokenizer chat template, greedy decoding, `max_new_tokens=1024`, batch size
+1이다. 출력에는 token/latency, finish reason, truncation, raw generation과 parser 결과를 함께
+보존한다. 문제 풀이용 Python/SymPy/calculator/tool은 사용하지 않는다.

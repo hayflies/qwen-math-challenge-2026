@@ -1,0 +1,30 @@
+schema_version: 1
+
+experiment:
+  experiment_id: P000_phase0_smoke
+  phase: 0
+  model: null
+  checkpoint: null
+  dataset_version: null
+  train_samples: null
+  validation_split: null
+  external_datasets: []
+  seed: 20260824
+  learning_rate: null
+  epochs: null
+  batch_size: null
+  gradient_accumulation: null
+  max_length: null
+  lora_config: null
+  prompt_template: null
+  inference_config: null
+  parser_version: null
+  local_validation_score: null
+  per_category_scores: {}
+  leaderboard_score: null
+  notes: "Phase 0 infrastructure smoke test; no model or dataset processing."
+
+runtime:
+  output_root: outputs
+  log_level: INFO
+  deterministic: true

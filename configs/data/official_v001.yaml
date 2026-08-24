@@ -1,0 +1,57 @@
+schema_version: 1
+
+experiment:
+  experiment_id: P001_official_v001_prepare
+  phase: 1
+  model: null
+  checkpoint: null
+  dataset_version: official_v001
+  train_samples: 16373
+  validation_split: null
+  external_datasets: []
+  seed: 20260824
+  learning_rate: null
+  epochs: null
+  batch_size: null
+  gradient_accumulation: null
+  max_length: null
+  lora_config: null
+  prompt_template: null
+  inference_config: null
+  parser_version: null
+  local_validation_score: null
+  per_category_scores: {}
+  leaderboard_score: null
+  notes: "Phase 1 official data audit and mandatory 627-ID filtering only."
+
+runtime:
+  output_root: outputs
+  log_level: INFO
+  deterministic: true
+
+dataset:
+  dataset_version: official_v001
+  raw_manifest: data/manifests/official_v001_raw_manifest.json
+  paths:
+    train: data/raw/official_v001/deep_chal_math_train.csv
+    leaderboard: data/raw/official_v001/deep_chal_math_leaderboard_filtered.csv
+    filtered_ids: data/raw/official_v001/train_filtered_ids.csv
+    processed_dir: data/processed/official_v001
+  schema:
+    train: [id, question, answer]
+    leaderboard: [id, question]
+    filtered_ids: [id, answer, question]
+  invariants:
+    raw_train_rows: 17000
+    leaderboard_rows: 831
+    mandatory_exclusion_rows: 627
+    clean_train_rows: 16373
+  filtering:
+    mandatory_exclusion_role: filtered_ids
+    key: id
+    candidate_exclusion_sources: []
+    apply_candidate_exclusions: false
+  audit:
+    unusually_short_question_chars: 20
+    unusually_long_question_chars: 2000
+    max_examples_per_reason: 25

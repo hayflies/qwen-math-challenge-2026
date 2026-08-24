@@ -1,0 +1,1364 @@
+{
+  "config_sha256": "4817d71aa23d391545ea6d3145a827147c8117e3806591b4b9a77b60bc97d673",
+  "created_at_utc": "2026-08-24T13:57:25.164461+00:00",
+  "cross_dataset_checks": {
+    "clean_leaderboard_question_exact_overlap": {
+      "count": 0,
+      "example_values": []
+    },
+    "train_leaderboard_id_exact_overlap": {
+      "count": 0,
+      "example_values": []
+    },
+    "train_leaderboard_question_exact_overlap": {
+      "count": 0,
+      "example_values": []
+    },
+    "train_leaderboard_question_normalized_overlap": {
+      "count": 0,
+      "example_values": []
+    }
+  },
+  "dataset_version": "official_v001",
+  "filtered_id_validation": {
+    "answer_mismatch_count": 0,
+    "filter_key": "id",
+    "mandatory_exclusion_count": 627,
+    "missing_from_train_count": 0,
+    "non_excluded_rows_lost_count": 0,
+    "question_different_count": 352,
+    "question_exact_match_count": 275,
+    "remaining_in_clean_count": 0
+  },
+  "follow_up": {
+    "near_duplicate_or_semantic_leakage": "Deferred to Phase 2/8.",
+    "tokenizer_length_analysis": "Deferred until a later Phase introduces the approved Qwen tokenizer dependency."
+  },
+  "pipeline_version": "phase1_official_v001",
+  "policy": {
+    "automatic_deletion": "mandatory 627 IDs only",
+    "candidate_exclusion_sources": [],
+    "candidate_exclusions_applied": false,
+    "suspect_rows": "report_only"
+  },
+  "quality_audit": {
+    "clean_train": {
+      "examples_by_reason": {
+        "abnormal_character_pattern_candidate": [
+          {
+            "id": "train-000835",
+            "question_length": 875
+          },
+          {
+            "id": "train-000950",
+            "question_length": 486
+          },
+          {
+            "id": "train-001149",
+            "question_length": 76
+          },
+          {
+            "id": "train-001243",
+            "question_length": 1438
+          },
+          {
+            "id": "train-002958",
+            "question_length": 94
+          },
+          {
+            "id": "train-004054",
+            "question_length": 38
+          },
+          {
+            "id": "train-004277",
+            "question_length": 502
+          },
+          {
+            "id": "train-004889",
+            "question_length": 1465
+          },
+          {
+            "id": "train-005307",
+            "question_length": 71
+          },
+          {
+            "id": "train-006088",
+            "question_length": 1159
+          },
+          {
+            "id": "train-006441",
+            "question_length": 1388
+          },
+          {
+            "id": "train-006660",
+            "question_length": 1934
+          },
+          {
+            "id": "train-006925",
+            "question_length": 72
+          },
+          {
+            "id": "train-006936",
+            "question_length": 495
+          },
+          {
+            "id": "train-007429",
+            "question_length": 53
+          },
+          {
+            "id": "train-007431",
+            "question_length": 219
+          },
+          {
+            "id": "train-008068",
+            "question_length": 62
+          },
+          {
+            "id": "train-009586",
+            "question_length": 1768
+          },
+          {
+            "id": "train-009993",
+            "question_length": 341
+          },
+          {
+            "id": "train-010129",
+            "question_length": 94
+          },
+          {
+            "id": "train-012288",
+            "question_length": 586
+          },
+          {
+            "id": "train-012625",
+            "question_length": 119
+          },
+          {
+            "id": "train-012862",
+            "question_length": 62
+          },
+          {
+            "id": "train-013827",
+            "question_length": 508
+          },
+          {
+            "id": "train-014621",
+            "question_length": 52
+          }
+        ],
+        "contains_url": [
+          {
+            "id": "train-011467",
+            "question_length": 724
+          },
+          {
+            "id": "train-014215",
+            "question_length": 815
+          }
+        ],
+        "latex_or_markup_anomaly_candidate": [
+          {
+            "id": "train-001568",
+            "question_length": 177
+          },
+          {
+            "id": "train-001577",
+            "question_length": 242
+          },
+          {
+            "id": "train-002497",
+            "question_length": 69
+          },
+          {
+            "id": "train-002538",
+            "question_length": 183
+          },
+          {
+            "id": "train-002720",
+            "question_length": 139
+          },
+          {
+            "id": "train-003768",
+            "question_length": 158
+          },
+          {
+            "id": "train-004268",
+            "question_length": 434
+          },
+          {
+            "id": "train-004754",
+            "question_length": 233
+          },
+          {
+            "id": "train-004815",
+            "question_length": 253
+          },
+          {
+            "id": "train-004854",
+            "question_length": 256
+          },
+          {
+            "id": "train-005094",
+            "question_length": 214
+          },
+          {
+            "id": "train-005489",
+            "question_length": 222
+          },
+          {
+            "id": "train-005492",
+            "question_length": 240
+          },
+          {
+            "id": "train-006259",
+            "question_length": 242
+          },
+          {
+            "id": "train-006428",
+            "question_length": 243
+          },
+          {
+            "id": "train-007562",
+            "question_length": 292
+          },
+          {
+            "id": "train-007574",
+            "question_length": 242
+          },
+          {
+            "id": "train-007586",
+            "question_length": 288
+          },
+          {
+            "id": "train-007815",
+            "question_length": 318
+          },
+          {
+            "id": "train-008507",
+            "question_length": 477
+          },
+          {
+            "id": "train-009006",
+            "question_length": 175
+          },
+          {
+            "id": "train-009053",
+            "question_length": 183
+          },
+          {
+            "id": "train-009580",
+            "question_length": 214
+          },
+          {
+            "id": "train-009586",
+            "question_length": 1768
+          },
+          {
+            "id": "train-010076",
+            "question_length": 352
+          }
+        ],
+        "unusually_long_question": [
+          {
+            "id": "train-008273",
+            "question_length": 2445
+          },
+          {
+            "id": "train-008275",
+            "question_length": 3560
+          },
+          {
+            "id": "train-013948",
+            "question_length": 2128
+          }
+        ]
+      },
+      "policy": "report_only_no_automatic_deletion",
+      "reason_counts": {
+        "abnormal_character_pattern_candidate": 29,
+        "contains_url": 2,
+        "latex_or_markup_anomaly_candidate": 47,
+        "unusually_long_question": 3
+      },
+      "suspect_row_count": 80
+    },
+    "filtered_ids": {
+      "examples_by_reason": {
+        "abnormal_character_pattern_candidate": [
+          {
+            "id": "train-003323",
+            "question_length": 841
+          },
+          {
+            "id": "train-003351",
+            "question_length": 506
+          },
+          {
+            "id": "train-004913",
+            "question_length": 1127
+          },
+          {
+            "id": "train-009662",
+            "question_length": 433
+          },
+          {
+            "id": "train-014533",
+            "question_length": 904
+          }
+        ],
+        "contains_markdown_image": [
+          {
+            "id": "train-000017",
+            "question_length": 139
+          },
+          {
+            "id": "train-000285",
+            "question_length": 363
+          },
+          {
+            "id": "train-000380",
+            "question_length": 585
+          },
+          {
+            "id": "train-000455",
+            "question_length": 365
+          },
+          {
+            "id": "train-000461",
+            "question_length": 1193
+          },
+          {
+            "id": "train-000611",
+            "question_length": 686
+          },
+          {
+            "id": "train-000973",
+            "question_length": 481
+          },
+          {
+            "id": "train-001289",
+            "question_length": 238
+          },
+          {
+            "id": "train-001337",
+            "question_length": 563
+          },
+          {
+            "id": "train-001462",
+            "question_length": 203
+          },
+          {
+            "id": "train-001690",
+            "question_length": 286
+          },
+          {
+            "id": "train-001761",
+            "question_length": 192
+          },
+          {
+            "id": "train-001851",
+            "question_length": 185
+          },
+          {
+            "id": "train-001934",
+            "question_length": 963
+          },
+          {
+            "id": "train-002011",
+            "question_length": 520
+          },
+          {
+            "id": "train-002150",
+            "question_length": 435
+          },
+          {
+            "id": "train-002159",
+            "question_length": 396
+          },
+          {
+            "id": "train-002228",
+            "question_length": 291
+          },
+          {
+            "id": "train-002297",
+            "question_length": 415
+          },
+          {
+            "id": "train-002331",
+            "question_length": 249
+          },
+          {
+            "id": "train-002636",
+            "question_length": 457
+          },
+          {
+            "id": "train-002694",
+            "question_length": 459
+          },
+          {
+            "id": "train-002997",
+            "question_length": 606
+          },
+          {
+            "id": "train-003143",
+            "question_length": 311
+          },
+          {
+            "id": "train-003177",
+            "question_length": 836
+          }
+        ],
+        "contains_url": [
+          {
+            "id": "train-000008",
+            "question_length": 548
+          },
+          {
+            "id": "train-000017",
+            "question_length": 139
+          },
+          {
+            "id": "train-000285",
+            "question_length": 363
+          },
+          {
+            "id": "train-000294",
+            "question_length": 301
+          },
+          {
+            "id": "train-000380",
+            "question_length": 585
+          },
+          {
+            "id": "train-000455",
+            "question_length": 365
+          },
+          {
+            "id": "train-000461",
+            "question_length": 1193
+          },
+          {
+            "id": "train-000611",
+            "question_length": 686
+          },
+          {
+            "id": "train-000708",
+            "question_length": 3575
+          },
+          {
+            "id": "train-000973",
+            "question_length": 481
+          },
+          {
+            "id": "train-001289",
+            "question_length": 238
+          },
+          {
+            "id": "train-001337",
+            "question_length": 563
+          },
+          {
+            "id": "train-001462",
+            "question_length": 203
+          },
+          {
+            "id": "train-001690",
+            "question_length": 286
+          },
+          {
+            "id": "train-001761",
+            "question_length": 192
+          },
+          {
+            "id": "train-001851",
+            "question_length": 185
+          },
+          {
+            "id": "train-001934",
+            "question_length": 963
+          },
+          {
+            "id": "train-002003",
+            "question_length": 287
+          },
+          {
+            "id": "train-002011",
+            "question_length": 520
+          },
+          {
+            "id": "train-002150",
+            "question_length": 435
+          },
+          {
+            "id": "train-002159",
+            "question_length": 396
+          },
+          {
+            "id": "train-002228",
+            "question_length": 291
+          },
+          {
+            "id": "train-002297",
+            "question_length": 415
+          },
+          {
+            "id": "train-002331",
+            "question_length": 249
+          },
+          {
+            "id": "train-002352",
+            "question_length": 264
+          }
+        ],
+        "latex_or_markup_anomaly_candidate": [
+          {
+            "id": "train-000189",
+            "question_length": 65
+          },
+          {
+            "id": "train-001262",
+            "question_length": 187
+          },
+          {
+            "id": "train-004564",
+            "question_length": 472
+          },
+          {
+            "id": "train-004762",
+            "question_length": 365
+          },
+          {
+            "id": "train-004943",
+            "question_length": 468
+          },
+          {
+            "id": "train-007155",
+            "question_length": 336
+          },
+          {
+            "id": "train-007332",
+            "question_length": 508
+          },
+          {
+            "id": "train-010203",
+            "question_length": 333
+          },
+          {
+            "id": "train-011076",
+            "question_length": 410
+          },
+          {
+            "id": "train-012221",
+            "question_length": 735
+          },
+          {
+            "id": "train-013597",
+            "question_length": 469
+          },
+          {
+            "id": "train-014643",
+            "question_length": 462
+          },
+          {
+            "id": "train-015572",
+            "question_length": 309
+          }
+        ],
+        "unusually_long_question": [
+          {
+            "id": "train-000708",
+            "question_length": 3575
+          },
+          {
+            "id": "train-006609",
+            "question_length": 3160
+          },
+          {
+            "id": "train-007989",
+            "question_length": 4486
+          },
+          {
+            "id": "train-016985",
+            "question_length": 4149
+          }
+        ],
+        "unusually_short_question": [
+          {
+            "id": "train-001866",
+            "question_length": 18
+          },
+          {
+            "id": "train-003580",
+            "question_length": 19
+          },
+          {
+            "id": "train-005523",
+            "question_length": 8
+          },
+          {
+            "id": "train-008622",
+            "question_length": 19
+          },
+          {
+            "id": "train-009195",
+            "question_length": 19
+          },
+          {
+            "id": "train-010562",
+            "question_length": 13
+          },
+          {
+            "id": "train-012964",
+            "question_length": 12
+          },
+          {
+            "id": "train-014626",
+            "question_length": 18
+          }
+        ]
+      },
+      "policy": "report_only_no_automatic_deletion",
+      "reason_counts": {
+        "abnormal_character_pattern_candidate": 5,
+        "contains_markdown_image": 127,
+        "contains_url": 150,
+        "latex_or_markup_anomaly_candidate": 13,
+        "unusually_long_question": 4,
+        "unusually_short_question": 8
+      },
+      "suspect_row_count": 173
+    },
+    "leaderboard": {
+      "examples_by_reason": {
+        "unusually_long_question": [
+          {
+            "id": "val-000595",
+            "question_length": 4391
+          }
+        ]
+      },
+      "policy": "report_only_no_automatic_deletion",
+      "reason_counts": {
+        "unusually_long_question": 1
+      },
+      "suspect_row_count": 1
+    },
+    "raw_train": {
+      "examples_by_reason": {
+        "abnormal_character_pattern_candidate": [
+          {
+            "id": "train-000835",
+            "question_length": 875
+          },
+          {
+            "id": "train-000950",
+            "question_length": 486
+          },
+          {
+            "id": "train-001149",
+            "question_length": 76
+          },
+          {
+            "id": "train-001243",
+            "question_length": 1438
+          },
+          {
+            "id": "train-002958",
+            "question_length": 94
+          },
+          {
+            "id": "train-003323",
+            "question_length": 891
+          },
+          {
+            "id": "train-003351",
+            "question_length": 519
+          },
+          {
+            "id": "train-004054",
+            "question_length": 38
+          },
+          {
+            "id": "train-004277",
+            "question_length": 502
+          },
+          {
+            "id": "train-004889",
+            "question_length": 1465
+          },
+          {
+            "id": "train-004913",
+            "question_length": 1129
+          },
+          {
+            "id": "train-005307",
+            "question_length": 71
+          },
+          {
+            "id": "train-006088",
+            "question_length": 1159
+          },
+          {
+            "id": "train-006441",
+            "question_length": 1388
+          },
+          {
+            "id": "train-006660",
+            "question_length": 1934
+          },
+          {
+            "id": "train-006925",
+            "question_length": 72
+          },
+          {
+            "id": "train-006936",
+            "question_length": 495
+          },
+          {
+            "id": "train-007429",
+            "question_length": 53
+          },
+          {
+            "id": "train-007431",
+            "question_length": 219
+          },
+          {
+            "id": "train-008068",
+            "question_length": 62
+          },
+          {
+            "id": "train-009586",
+            "question_length": 1768
+          },
+          {
+            "id": "train-009662",
+            "question_length": 594
+          },
+          {
+            "id": "train-009993",
+            "question_length": 341
+          },
+          {
+            "id": "train-010129",
+            "question_length": 94
+          },
+          {
+            "id": "train-012288",
+            "question_length": 586
+          }
+        ],
+        "contains_markdown_image": [
+          {
+            "id": "train-000017",
+            "question_length": 140
+          },
+          {
+            "id": "train-000285",
+            "question_length": 364
+          },
+          {
+            "id": "train-000380",
+            "question_length": 588
+          },
+          {
+            "id": "train-000455",
+            "question_length": 366
+          },
+          {
+            "id": "train-000461",
+            "question_length": 1200
+          },
+          {
+            "id": "train-000611",
+            "question_length": 687
+          },
+          {
+            "id": "train-000973",
+            "question_length": 487
+          },
+          {
+            "id": "train-001289",
+            "question_length": 240
+          },
+          {
+            "id": "train-001337",
+            "question_length": 564
+          },
+          {
+            "id": "train-001462",
+            "question_length": 205
+          },
+          {
+            "id": "train-001690",
+            "question_length": 288
+          },
+          {
+            "id": "train-001761",
+            "question_length": 193
+          },
+          {
+            "id": "train-001851",
+            "question_length": 186
+          },
+          {
+            "id": "train-001934",
+            "question_length": 970
+          },
+          {
+            "id": "train-002011",
+            "question_length": 522
+          },
+          {
+            "id": "train-002150",
+            "question_length": 438
+          },
+          {
+            "id": "train-002159",
+            "question_length": 399
+          },
+          {
+            "id": "train-002228",
+            "question_length": 292
+          },
+          {
+            "id": "train-002297",
+            "question_length": 416
+          },
+          {
+            "id": "train-002331",
+            "question_length": 252
+          },
+          {
+            "id": "train-002636",
+            "question_length": 460
+          },
+          {
+            "id": "train-002694",
+            "question_length": 464
+          },
+          {
+            "id": "train-002997",
+            "question_length": 607
+          },
+          {
+            "id": "train-003143",
+            "question_length": 312
+          },
+          {
+            "id": "train-003177",
+            "question_length": 839
+          }
+        ],
+        "contains_url": [
+          {
+            "id": "train-000008",
+            "question_length": 548
+          },
+          {
+            "id": "train-000017",
+            "question_length": 140
+          },
+          {
+            "id": "train-000285",
+            "question_length": 364
+          },
+          {
+            "id": "train-000294",
+            "question_length": 301
+          },
+          {
+            "id": "train-000380",
+            "question_length": 588
+          },
+          {
+            "id": "train-000455",
+            "question_length": 366
+          },
+          {
+            "id": "train-000461",
+            "question_length": 1200
+          },
+          {
+            "id": "train-000611",
+            "question_length": 687
+          },
+          {
+            "id": "train-000708",
+            "question_length": 3621
+          },
+          {
+            "id": "train-000973",
+            "question_length": 487
+          },
+          {
+            "id": "train-001289",
+            "question_length": 240
+          },
+          {
+            "id": "train-001337",
+            "question_length": 564
+          },
+          {
+            "id": "train-001462",
+            "question_length": 205
+          },
+          {
+            "id": "train-001690",
+            "question_length": 288
+          },
+          {
+            "id": "train-001761",
+            "question_length": 193
+          },
+          {
+            "id": "train-001851",
+            "question_length": 186
+          },
+          {
+            "id": "train-001934",
+            "question_length": 970
+          },
+          {
+            "id": "train-002003",
+            "question_length": 287
+          },
+          {
+            "id": "train-002011",
+            "question_length": 522
+          },
+          {
+            "id": "train-002150",
+            "question_length": 438
+          },
+          {
+            "id": "train-002159",
+            "question_length": 399
+          },
+          {
+            "id": "train-002228",
+            "question_length": 292
+          },
+          {
+            "id": "train-002297",
+            "question_length": 416
+          },
+          {
+            "id": "train-002331",
+            "question_length": 252
+          },
+          {
+            "id": "train-002352",
+            "question_length": 265
+          }
+        ],
+        "latex_or_markup_anomaly_candidate": [
+          {
+            "id": "train-000189",
+            "question_length": 65
+          },
+          {
+            "id": "train-001262",
+            "question_length": 187
+          },
+          {
+            "id": "train-001568",
+            "question_length": 177
+          },
+          {
+            "id": "train-001577",
+            "question_length": 242
+          },
+          {
+            "id": "train-002497",
+            "question_length": 69
+          },
+          {
+            "id": "train-002538",
+            "question_length": 183
+          },
+          {
+            "id": "train-002720",
+            "question_length": 139
+          },
+          {
+            "id": "train-003768",
+            "question_length": 158
+          },
+          {
+            "id": "train-004268",
+            "question_length": 434
+          },
+          {
+            "id": "train-004564",
+            "question_length": 477
+          },
+          {
+            "id": "train-004754",
+            "question_length": 233
+          },
+          {
+            "id": "train-004762",
+            "question_length": 368
+          },
+          {
+            "id": "train-004815",
+            "question_length": 253
+          },
+          {
+            "id": "train-004854",
+            "question_length": 256
+          },
+          {
+            "id": "train-004943",
+            "question_length": 471
+          },
+          {
+            "id": "train-005094",
+            "question_length": 214
+          },
+          {
+            "id": "train-005489",
+            "question_length": 222
+          },
+          {
+            "id": "train-005492",
+            "question_length": 240
+          },
+          {
+            "id": "train-006259",
+            "question_length": 242
+          },
+          {
+            "id": "train-006428",
+            "question_length": 243
+          },
+          {
+            "id": "train-007155",
+            "question_length": 336
+          },
+          {
+            "id": "train-007332",
+            "question_length": 513
+          },
+          {
+            "id": "train-007562",
+            "question_length": 292
+          },
+          {
+            "id": "train-007574",
+            "question_length": 242
+          },
+          {
+            "id": "train-007586",
+            "question_length": 288
+          }
+        ],
+        "unusually_long_question": [
+          {
+            "id": "train-000708",
+            "question_length": 3621
+          },
+          {
+            "id": "train-006609",
+            "question_length": 3181
+          },
+          {
+            "id": "train-007989",
+            "question_length": 4517
+          },
+          {
+            "id": "train-008273",
+            "question_length": 2445
+          },
+          {
+            "id": "train-008275",
+            "question_length": 3560
+          },
+          {
+            "id": "train-013948",
+            "question_length": 2128
+          },
+          {
+            "id": "train-016985",
+            "question_length": 4161
+          }
+        ],
+        "unusually_short_question": [
+          {
+            "id": "train-001866",
+            "question_length": 18
+          },
+          {
+            "id": "train-003580",
+            "question_length": 19
+          },
+          {
+            "id": "train-005523",
+            "question_length": 8
+          },
+          {
+            "id": "train-008622",
+            "question_length": 19
+          },
+          {
+            "id": "train-009195",
+            "question_length": 19
+          },
+          {
+            "id": "train-010562",
+            "question_length": 13
+          },
+          {
+            "id": "train-012964",
+            "question_length": 12
+          },
+          {
+            "id": "train-014626",
+            "question_length": 18
+          }
+        ]
+      },
+      "policy": "report_only_no_automatic_deletion",
+      "reason_counts": {
+        "abnormal_character_pattern_candidate": 34,
+        "contains_markdown_image": 127,
+        "contains_url": 152,
+        "latex_or_markup_anomaly_candidate": 60,
+        "unusually_long_question": 7,
+        "unusually_short_question": 8
+      },
+      "suspect_row_count": 253
+    }
+  },
+  "raw_manifest_sha256": "1091e5e54c98f59a9f0edd5623e07b803cd9c8669bdf18b0fe6acf3a850eec1c",
+  "schema_version": 1,
+  "tables": {
+    "clean_train": {
+      "answer": {
+        "all_integer": true,
+        "max": 3431577212128939,
+        "min": -2025078,
+        "negative_count": 486,
+        "zero_count": 210
+      },
+      "columns": [
+        "id",
+        "question",
+        "answer"
+      ],
+      "dtypes": {
+        "answer": "integer",
+        "id": "string",
+        "question": "string"
+      },
+      "id_duplicates": {
+        "extra_rows": 0,
+        "groups": 0,
+        "rows_in_duplicate_groups": 0
+      },
+      "id_unique": true,
+      "null_counts": {
+        "answer": 0,
+        "id": 0,
+        "question": 0
+      },
+      "path": "data/processed/official_v001/train_clean.csv",
+      "question_character_length": {
+        "max": 3560,
+        "mean": 231.054113,
+        "median": 201.0,
+        "min": 25,
+        "p01": 47.0,
+        "p05": 75.0,
+        "p95": 477.0,
+        "p99": 757.0,
+        "std": 146.754593
+      },
+      "question_exact_duplicates": {
+        "extra_rows": 0,
+        "groups": 0,
+        "rows_in_duplicate_groups": 0
+      },
+      "question_normalized_duplicates": {
+        "extra_rows": 0,
+        "groups": 0,
+        "rows_in_duplicate_groups": 0
+      },
+      "rows": 16373,
+      "sha256": "4c9d3646e4bf06078122ca4436b1a05b916f267d6c61f2040b9bfba891410d1c",
+      "shape": [
+        16373,
+        3
+      ],
+      "total_null_count": 0
+    },
+    "filtered_ids": {
+      "answer": {
+        "all_integer": true,
+        "max": 5865864355,
+        "min": -5765435,
+        "negative_count": 16,
+        "zero_count": 12
+      },
+      "columns": [
+        "id",
+        "answer",
+        "question"
+      ],
+      "dtypes": {
+        "answer": "integer",
+        "id": "string",
+        "question": "string"
+      },
+      "id_duplicates": {
+        "extra_rows": 0,
+        "groups": 0,
+        "rows_in_duplicate_groups": 0
+      },
+      "id_unique": true,
+      "null_counts": {
+        "answer": 0,
+        "id": 0,
+        "question": 0
+      },
+      "path": "data/raw/official_v001/train_filtered_ids.csv",
+      "question_character_length": {
+        "max": 4486,
+        "mean": 360.614035,
+        "median": 284.0,
+        "min": 8,
+        "p01": 19.0,
+        "p05": 62.2,
+        "p95": 884.9,
+        "p99": 1508.44,
+        "std": 378.599051
+      },
+      "question_exact_duplicates": {
+        "extra_rows": 0,
+        "groups": 0,
+        "rows_in_duplicate_groups": 0
+      },
+      "question_normalized_duplicates": {
+        "extra_rows": 0,
+        "groups": 0,
+        "rows_in_duplicate_groups": 0
+      },
+      "rows": 627,
+      "sha256": "67e4674afa685b985a6dc52e9050d9fb17116a99dbd9606cba82c976c904b4f3",
+      "shape": [
+        627,
+        3
+      ],
+      "total_null_count": 0
+    },
+    "leaderboard": {
+      "answer": null,
+      "columns": [
+        "id",
+        "question"
+      ],
+      "dtypes": {
+        "id": "string",
+        "question": "string"
+      },
+      "id_duplicates": {
+        "extra_rows": 0,
+        "groups": 0,
+        "rows_in_duplicate_groups": 0
+      },
+      "id_unique": true,
+      "null_counts": {
+        "id": 0,
+        "question": 0
+      },
+      "path": "data/raw/official_v001/deep_chal_math_leaderboard_filtered.csv",
+      "question_character_length": {
+        "max": 4391,
+        "mean": 234.677497,
+        "median": 205.0,
+        "min": 32,
+        "p01": 48.9,
+        "p05": 77.0,
+        "p95": 475.5,
+        "p99": 705.0,
+        "std": 196.163472
+      },
+      "question_exact_duplicates": {
+        "extra_rows": 0,
+        "groups": 0,
+        "rows_in_duplicate_groups": 0
+      },
+      "question_normalized_duplicates": {
+        "extra_rows": 0,
+        "groups": 0,
+        "rows_in_duplicate_groups": 0
+      },
+      "rows": 831,
+      "sha256": "032333a1361c8083093674ad19817e024c38dc7c9f4bdf05c0c9b0c71940dcf1",
+      "shape": [
+        831,
+        2
+      ],
+      "total_null_count": 0
+    },
+    "raw_train": {
+      "answer": {
+        "all_integer": true,
+        "max": 3431577212128939,
+        "min": -5765435,
+        "negative_count": 502,
+        "zero_count": 222
+      },
+      "columns": [
+        "id",
+        "question",
+        "answer"
+      ],
+      "dtypes": {
+        "answer": "integer",
+        "id": "string",
+        "question": "string"
+      },
+      "id_duplicates": {
+        "extra_rows": 0,
+        "groups": 0,
+        "rows_in_duplicate_groups": 0
+      },
+      "id_unique": true,
+      "null_counts": {
+        "answer": 0,
+        "id": 0,
+        "question": 0
+      },
+      "path": "data/raw/official_v001/deep_chal_math_train.csv",
+      "question_character_length": {
+        "max": 4517,
+        "mean": 235.896824,
+        "median": 203.0,
+        "min": 8,
+        "p01": 46.0,
+        "p05": 75.0,
+        "p95": 492.0,
+        "p99": 791.01,
+        "std": 163.444958
+      },
+      "question_exact_duplicates": {
+        "extra_rows": 0,
+        "groups": 0,
+        "rows_in_duplicate_groups": 0
+      },
+      "question_normalized_duplicates": {
+        "extra_rows": 0,
+        "groups": 0,
+        "rows_in_duplicate_groups": 0
+      },
+      "rows": 17000,
+      "sha256": "e240dcd9752d12143162706cee4818d4025456605c991ece337df6e9abeb869a",
+      "shape": [
+        17000,
+        3
+      ],
+      "total_null_count": 0
+    }
+  }
+}

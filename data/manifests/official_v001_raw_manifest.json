@@ -1,0 +1,25 @@
+{
+  "dataset_version": "official_v001",
+  "manifest_version": 1,
+  "source": "Official competition CSV files supplied by the user",
+  "verified_date": "2026-08-24",
+  "files": {
+    "filtered_ids": {
+      "path": "data/raw/official_v001/train_filtered_ids.csv",
+      "sha256": "67e4674afa685b985a6dc52e9050d9fb17116a99dbd9606cba82c976c904b4f3"
+    },
+    "leaderboard": {
+      "path": "data/raw/official_v001/deep_chal_math_leaderboard_filtered.csv",
+      "sha256": "032333a1361c8083093674ad19817e024c38dc7c9f4bdf05c0c9b0c71940dcf1"
+    },
+    "train": {
+      "path": "data/raw/official_v001/deep_chal_math_train.csv",
+      "sha256": "e240dcd9752d12143162706cee4818d4025456605c991ece337df6e9abeb869a"
+    }
+  },
+  "policy": {
+    "candidate_exclusions": "not_available_not_applied",
+    "mandatory_exclusion": "train_filtered_ids.csv, keyed only by id",
+    "raw_files_immutable": true
+  }
+}

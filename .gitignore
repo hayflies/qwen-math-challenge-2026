@@ -1,0 +1,58 @@
+# Python environments and caches
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# IDE and operating-system files
+.idea/
+.vscode/
+.DS_Store
+
+# Secrets and local-only configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Official files currently supplied at the repository root
+/deep_chal_math_train.csv
+/deep_chal_math_leaderboard_filtered.csv
+/train_filtered_ids.csv
+/deep_chal_math_dataset_test.csv
+/deep_chal_math_test.csv
+
+# Raw and externally downloaded datasets are never committed
+/data/raw/**
+!/data/raw/.gitkeep
+/data/external/**
+!/data/external/.gitkeep
+
+# Large derived dataset payloads; small manifests remain trackable
+/data/processed/**/*.csv
+/data/processed/**/*.jsonl
+/data/processed/**/*.parquet
+/data/processed/**/*.arrow
+/data/splits/**/*.csv
+/data/splits/**/*.jsonl
+/data/splits/**/*.parquet
+/data/splits/**/*.arrow
+
+# Run outputs, caches, and model weights
+/outputs/**
+!/outputs/.gitkeep
+/wandb/
+/runs/
+*.safetensors
+*.ckpt
+*.pt
+*.pth
+pytorch_model*.bin
+adapter_model*.bin

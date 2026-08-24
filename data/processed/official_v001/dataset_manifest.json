@@ -1,0 +1,179 @@
+{
+  "audit_report_path": "data/processed/official_v001/audit_report.json",
+  "audit_report_sha256": "811769d6485bc96a7bab24dee5e28b20464e53e865ce9002f954c815425a367a",
+  "audit_summary": {
+    "cross_dataset_checks": {
+      "clean_leaderboard_question_exact_overlap": {
+        "count": 0,
+        "example_values": []
+      },
+      "train_leaderboard_id_exact_overlap": {
+        "count": 0,
+        "example_values": []
+      },
+      "train_leaderboard_question_exact_overlap": {
+        "count": 0,
+        "example_values": []
+      },
+      "train_leaderboard_question_normalized_overlap": {
+        "count": 0,
+        "example_values": []
+      }
+    },
+    "filtered_id_validation": {
+      "answer_mismatch_count": 0,
+      "filter_key": "id",
+      "mandatory_exclusion_count": 627,
+      "missing_from_train_count": 0,
+      "non_excluded_rows_lost_count": 0,
+      "question_different_count": 352,
+      "question_exact_match_count": 275,
+      "remaining_in_clean_count": 0
+    },
+    "quality_reason_counts": {
+      "clean_train": {
+        "abnormal_character_pattern_candidate": 29,
+        "contains_url": 2,
+        "latex_or_markup_anomaly_candidate": 47,
+        "unusually_long_question": 3
+      },
+      "filtered_ids": {
+        "abnormal_character_pattern_candidate": 5,
+        "contains_markdown_image": 127,
+        "contains_url": 150,
+        "latex_or_markup_anomaly_candidate": 13,
+        "unusually_long_question": 4,
+        "unusually_short_question": 8
+      },
+      "leaderboard": {
+        "unusually_long_question": 1
+      },
+      "raw_train": {
+        "abnormal_character_pattern_candidate": 34,
+        "contains_markdown_image": 127,
+        "contains_url": 152,
+        "latex_or_markup_anomaly_candidate": 60,
+        "unusually_long_question": 7,
+        "unusually_short_question": 8
+      }
+    },
+    "question_character_length": {
+      "clean_train": {
+        "max": 3560,
+        "mean": 231.054113,
+        "median": 201.0,
+        "min": 25,
+        "p01": 47.0,
+        "p05": 75.0,
+        "p95": 477.0,
+        "p99": 757.0,
+        "std": 146.754593
+      },
+      "filtered_ids": {
+        "max": 4486,
+        "mean": 360.614035,
+        "median": 284.0,
+        "min": 8,
+        "p01": 19.0,
+        "p05": 62.2,
+        "p95": 884.9,
+        "p99": 1508.44,
+        "std": 378.599051
+      },
+      "leaderboard": {
+        "max": 4391,
+        "mean": 234.677497,
+        "median": 205.0,
+        "min": 32,
+        "p01": 48.9,
+        "p05": 77.0,
+        "p95": 475.5,
+        "p99": 705.0,
+        "std": 196.163472
+      },
+      "raw_train": {
+        "max": 4517,
+        "mean": 235.896824,
+        "median": 203.0,
+        "min": 8,
+        "p01": 46.0,
+        "p05": 75.0,
+        "p95": 492.0,
+        "p99": 791.01,
+        "std": 163.444958
+      }
+    }
+  },
+  "clean_train_path": "data/processed/official_v001/train_clean.csv",
+  "clean_train_rows": 16373,
+  "clean_train_sha256": "4c9d3646e4bf06078122ca4436b1a05b916f267d6c61f2040b9bfba891410d1c",
+  "code": {
+    "config_sha256": "4817d71aa23d391545ea6d3145a827147c8117e3806591b4b9a77b60bc97d673",
+    "git": {
+      "available": true,
+      "branch": "main",
+      "commit": null,
+      "dirty": true,
+      "head_state": "unborn"
+    },
+    "module_path": "src/qwen_math_challenge/data/official.py",
+    "module_sha256": "479c3c175fd00655cff1f80c7727d6dd9e8002e8a52f869c9a306f354972d432"
+  },
+  "created_at_utc": "2026-08-24T13:57:25.164461+00:00",
+  "dataset_version": "official_v001",
+  "filter_policy": {
+    "candidate_exclusion_sources": [],
+    "candidate_exclusions_applied": false,
+    "key": "id",
+    "mandatory_exclusion_source": "data/raw/official_v001/train_filtered_ids.csv",
+    "question_equality_used_for_filtering": false
+  },
+  "mandatory_exclusion_count": 627,
+  "pipeline_version": "phase1_official_v001",
+  "raw_manifest": {
+    "hashes_verified_before_and_after": true,
+    "path": "data/manifests/official_v001_raw_manifest.json",
+    "sha256": "1091e5e54c98f59a9f0edd5623e07b803cd9c8669bdf18b0fe6acf3a850eec1c"
+  },
+  "schema_version": 1,
+  "source_columns": {
+    "filtered_ids": [
+      "id",
+      "answer",
+      "question"
+    ],
+    "leaderboard": [
+      "id",
+      "question"
+    ],
+    "train": [
+      "id",
+      "question",
+      "answer"
+    ]
+  },
+  "source_file_sha256": {
+    "filtered_ids": "67e4674afa685b985a6dc52e9050d9fb17116a99dbd9606cba82c976c904b4f3",
+    "leaderboard": "032333a1361c8083093674ad19817e024c38dc7c9f4bdf05c0c9b0c71940dcf1",
+    "train": "e240dcd9752d12143162706cee4818d4025456605c991ece337df6e9abeb869a"
+  },
+  "source_files": {
+    "filtered_ids": "data/raw/official_v001/train_filtered_ids.csv",
+    "leaderboard": "data/raw/official_v001/deep_chal_math_leaderboard_filtered.csv",
+    "train": "data/raw/official_v001/deep_chal_math_train.csv"
+  },
+  "source_shapes": {
+    "filtered_ids": [
+      627,
+      3
+    ],
+    "leaderboard": [
+      831,
+      2
+    ],
+    "train": [
+      17000,
+      3
+    ]
+  }
+}

@@ -1,0 +1,84 @@
+schema_version: 1
+
+experiment:
+  experiment_id: P002_official_v001_split
+  phase: 2
+  model: null
+  checkpoint: null
+  dataset_version: official_v001
+  train_samples: 14736
+  validation_split: official_v001_split_v001
+  external_datasets: []
+  seed: 2026
+  learning_rate: null
+  epochs: null
+  batch_size: null
+  gradient_accumulation: null
+  max_length: null
+  lora_config: null
+  prompt_template: null
+  inference_config: null
+  parser_version: null
+  local_validation_score: null
+  per_category_scores: {}
+  leaderboard_score: null
+  notes: "Phase 2 text-only near-duplicate grouping and leakage-safe internal split."
+
+runtime:
+  output_root: outputs
+  log_level: INFO
+  deterministic: true
+
+split:
+  split_version: official_v001_split_v001
+  source_dataset_version: official_v001
+  source:
+    clean_path: data/processed/official_v001/train_clean.csv
+    clean_sha256: 4c9d3646e4bf06078122ca4436b1a05b916f267d6c61f2040b9bfba891410d1c
+    row_count: 16373
+    columns: [id, question, answer]
+  leaderboard_audit:
+    enabled: true
+    path: data/raw/official_v001/deep_chal_math_leaderboard_filtered.csv
+    sha256: 032333a1361c8083093674ad19817e024c38dc7c9f4bdf05c0c9b0c71940dcf1
+    row_count: 831
+    columns: [id, question]
+    purpose: exact_and_normalized_overlap_audit_only
+  output_dir: data/splits/official_v001
+  target_val_ratio: 0.10
+  allowed_val_ratio: [0.095, 0.105]
+  normalization:
+    version: nfkc_casefold_ws_mathws_num_v1
+    nfkc: true
+    casefold: true
+    collapse_whitespace: true
+    normalize_math_whitespace: true
+    number_placeholder: "<num>"
+  near_duplicate:
+    enabled: true
+    algorithm: rare_token_bigram_blocking_char5_union_find
+    version: text_grouping_v1
+    character_ngram_size: 5
+    rare_token_ngrams_per_document: 10
+    max_token_ngram_document_frequency: 64
+    max_block_size: 64
+    min_template_characters: 20
+    min_length_ratio: 0.55
+    calibration_thresholds: [0.78, 0.82, 0.86, 0.90, 0.94]
+    review_threshold: 0.78
+    grouping_threshold: 0.82
+    threshold_rationale: >-
+      official_v001 경계 pair를 직접 검토했을 때 0.82 부근도 같은 문장 골격과
+      수치/표현만 바뀐 문제 family였고, 0.90 대비 최대 component가 7에서 8로만
+      증가해 거대 over-grouping 징후가 없었다. 0.78~0.82는 자동 확정하지 않고
+      review candidate로 보존한다.
+    metric_weights:
+      template_character_jaccard: 0.50
+      template_token_bigram_jaccard: 0.25
+      template_sequence_ratio: 0.25
+    representative_pairs_per_threshold: 8
+  category:
+    enabled: true
+    version: conservative_keyword_v1
+    use_for_split: false
+    unknown_allowed: true

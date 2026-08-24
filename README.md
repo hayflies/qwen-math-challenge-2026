@@ -4,8 +4,8 @@
 재현 가능한 실험 저장소다. 대회 규칙, 데이터 정책, 금지사항, Phase Gate의 최상위
 기준은 루트의 `AGENTS.md`다.
 
-현재 구현 범위는 **Phase 0 — 프로젝트 기반 및 재현성**과
-**Phase 1 — 공식 데이터 감사 및 정제**다. validation split, 모델 로드, 학습, 평가,
+현재 구현 범위는 **Phase 0 — 프로젝트 기반 및 재현성**, **Phase 1 — 공식 데이터 감사 및
+정제**, **Phase 2 — leakage-safe 내부 validation 구축**이다. 모델 로드, 학습, 평가,
 제출 생성 로직은 아직 구현하지 않는다.
 
 ## 환경 준비
@@ -67,3 +67,20 @@ uv run --frozen python scripts/inspect_data.py \
 
 커뮤니티 candidate exclusion은 현재 파일이 없으므로 적용하지 않는다. 향후 별도 dataset
 variant에서 검증하고 ablation한다.
+
+## Phase 2 내부 validation 생성
+
+다음 명령은 `official_v001` clean train의 hash와 16,373행 invariant를 확인한 뒤 보수적
+정규화, text-only near-duplicate blocking/유사도 평가, 연결요소 grouping, seed 2026의
+group-safe 약 10% split을 순서대로 실행한다.
+
+```bash
+uv run --frozen python scripts/create_split.py \
+  --config configs/data/split_official_v001.yaml
+```
+
+산출물은 `data/splits/official_v001/`에 생성된다. `train.csv`, `val.csv`, `groups.csv`,
+`near_duplicate_candidates.csv`는 대용량 payload로 Git에서 제외하고, 재현에 필요한
+`split_manifest.json`과 `split_report.json`은 추적한다. leaderboard는 exact/normalized
+overlap 감사에만 읽으며 train/validation에는 포함하지 않는다. derived category는 gold
+label이 아니므로 보고에만 사용하고 split 기준으로 사용하지 않는다.

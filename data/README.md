@@ -24,3 +24,8 @@ data/raw/official_v001/
 dataset version의 raw hash 기준은 `data/manifests/official_v001_raw_manifest.json`에 기록한다.
 공식 627개 ID는 mandatory exclusion이며, 아직 확보하지 않은 커뮤니티 후보는 자동 생성하거나
 적용하지 않는다.
+
+`data/splits/official_v001/`은 `train_clean.csv`의 고정 hash를 입력으로 하는 Phase 2
+group-safe split이다. CSV payload는 재생성 가능하므로 Git에서 제외하고, grouping/split
+설정·통계·artifact hash는 `split_manifest.json`과 `split_report.json`에 보존한다. 동일
+group은 train과 validation에 동시에 나타날 수 없다.

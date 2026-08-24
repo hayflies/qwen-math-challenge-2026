@@ -1,0 +1,693 @@
+{
+  "artifact_sha256": {
+    "groups.csv": "7f0f0376d8e2f12a67ff959bfa183518fd4ba2214e18076e2e7363073e7ff566",
+    "near_duplicate_candidates.csv": "aaa54456fa4fa5a503ae2ee6f1e7c17357d91e948f75bcbd1a282a6cd42ae9ff",
+    "train.csv": "797fe3396876d5a1c70f3269263661c4fc739e61b8e971e77e042f0dcb4fbfdd",
+    "val.csv": "cbf48fc75ed858795fa99cf15bd9de736465ba590d5752784af7de6b13c5a40c"
+  },
+  "category": {
+    "derived_not_gold": true,
+    "enabled": true,
+    "rationale": "No gold category exists; conservative keywords are report-only so uncertain labels cannot weaken group leakage prevention.",
+    "train": {
+      "algebra": {
+        "count": 883,
+        "ratio": 0.05992128
+      },
+      "calculus": {
+        "count": 10,
+        "ratio": 0.00067861
+      },
+      "combinatorics": {
+        "count": 87,
+        "ratio": 0.00590391
+      },
+      "geometry": {
+        "count": 679,
+        "ratio": 0.04607763
+      },
+      "number_theory": {
+        "count": 624,
+        "ratio": 0.04234528
+      },
+      "probability": {
+        "count": 107,
+        "ratio": 0.00726113
+      },
+      "unknown": {
+        "count": 11089,
+        "ratio": 0.75251086
+      },
+      "word_problem": {
+        "count": 1257,
+        "ratio": 0.0853013
+      }
+    },
+    "unknown_allowed": true,
+    "used_for_split": false,
+    "validation": {
+      "algebra": {
+        "count": 85,
+        "ratio": 0.05192425
+      },
+      "calculus": {
+        "count": 1,
+        "ratio": 0.00061087
+      },
+      "combinatorics": {
+        "count": 6,
+        "ratio": 0.00366524
+      },
+      "geometry": {
+        "count": 72,
+        "ratio": 0.0439829
+      },
+      "number_theory": {
+        "count": 80,
+        "ratio": 0.04886988
+      },
+      "probability": {
+        "count": 16,
+        "ratio": 0.00977398
+      },
+      "unknown": {
+        "count": 1227,
+        "ratio": 0.74954184
+      },
+      "word_problem": {
+        "count": 150,
+        "ratio": 0.09163103
+      }
+    },
+    "version": "conservative_keyword_v1"
+  },
+  "distribution_sanity": {
+    "answer_used_as_stratification_key": false,
+    "train": {
+      "answer_magnitude": {
+        "100_to_999": {
+          "count": 2730,
+          "ratio": 0.18526059
+        },
+        "10_to_99": {
+          "count": 5940,
+          "ratio": 0.40309446
+        },
+        "1_to_9": {
+          "count": 4085,
+          "ratio": 0.27721227
+        },
+        "1k_to_999999": {
+          "count": 1667,
+          "ratio": 0.11312432
+        },
+        "1m_or_more": {
+          "count": 113,
+          "ratio": 0.0076683
+        },
+        "zero": {
+          "count": 201,
+          "ratio": 0.01364007
+        }
+      },
+      "answer_sign": {
+        "negative": {
+          "count": 434,
+          "ratio": 0.02945168
+        },
+        "positive": {
+          "count": 14101,
+          "ratio": 0.95690825
+        },
+        "zero": {
+          "count": 201,
+          "ratio": 0.01364007
+        }
+      },
+      "question_character_length": {
+        "max": 3560,
+        "mean": 230.804153,
+        "median": 201.0,
+        "min": 25,
+        "p95": 475.25
+      },
+      "rows": 14736
+    },
+    "train_validation_delta": {
+      "answer_magnitude_ratio_absolute_delta": {
+        "100_to_999": 0.01632768,
+        "10_to_99": 0.01152451,
+        "1_to_9": 0.01356354,
+        "1k_to_999999": 0.00988669,
+        "1m_or_more": 0.00033782,
+        "zero": 0.00814221
+      },
+      "answer_sign_ratio_absolute_delta": {
+        "negative": 0.00231374,
+        "positive": 0.00582846,
+        "zero": 0.00814221
+      },
+      "question_length": {
+        "mean": 2.500062,
+        "median": 0.0,
+        "p95": 13.35
+      }
+    },
+    "validation": {
+      "answer_magnitude": {
+        "100_to_999": {
+          "count": 330,
+          "ratio": 0.20158827
+        },
+        "10_to_99": {
+          "count": 641,
+          "ratio": 0.39156995
+        },
+        "1_to_9": {
+          "count": 476,
+          "ratio": 0.29077581
+        },
+        "1k_to_999999": {
+          "count": 169,
+          "ratio": 0.10323763
+        },
+        "1m_or_more": {
+          "count": 12,
+          "ratio": 0.00733048
+        },
+        "zero": {
+          "count": 9,
+          "ratio": 0.00549786
+        }
+      },
+      "answer_sign": {
+        "negative": {
+          "count": 52,
+          "ratio": 0.03176542
+        },
+        "positive": {
+          "count": 1576,
+          "ratio": 0.96273671
+        },
+        "zero": {
+          "count": 9,
+          "ratio": 0.00549786
+        }
+      },
+      "question_character_length": {
+        "max": 1951,
+        "mean": 233.304215,
+        "median": 201.0,
+        "min": 30,
+        "p95": 488.6
+      },
+      "rows": 1637
+    }
+  },
+  "duplicate_audit": {
+    "exact_question": {
+      "extra_rows": 0,
+      "groups": 0,
+      "largest_group_size": 1,
+      "rows_in_duplicate_groups": 0
+    },
+    "id": {
+      "extra_rows": 0,
+      "groups": 0,
+      "largest_group_size": 1,
+      "rows_in_duplicate_groups": 0
+    },
+    "mathematical_symbols_removed": false,
+    "normalization_version": "nfkc_casefold_ws_mathws_num_v1",
+    "normalized_question": {
+      "extra_rows": 0,
+      "groups": 0,
+      "largest_group_size": 1,
+      "rows_in_duplicate_groups": 0
+    }
+  },
+  "groups": {
+    "group_size_distribution": {
+      "1": 15556,
+      "2": 322,
+      "3": 35,
+      "4": 8,
+      "5": 4,
+      "8": 2
+    },
+    "largest_group_size": 8,
+    "multi_member_groups": 371,
+    "singleton_groups": 15556,
+    "total_groups": 15927
+  },
+  "leaderboard_audit": {
+    "answer_accessed": false,
+    "enabled": true,
+    "leaderboard_rows": 831,
+    "leaderboard_sha256": "032333a1361c8083093674ad19817e024c38dc7c9f4bdf05c0c9b0c71940dcf1",
+    "near_duplicate_answer_lookup": false,
+    "purpose": "exact_and_normalized_overlap_audit_only",
+    "train_overlap": {
+      "exact_question": 0,
+      "id": 0,
+      "normalized_question": 0
+    },
+    "val_overlap": {
+      "exact_question": 0,
+      "id": 0,
+      "normalized_question": 0
+    }
+  },
+  "near_duplicate": {
+    "auto_group_pairs": 546,
+    "candidate_generation": {
+      "all_pairs_if_quadratic": 134029378,
+      "blocking": {
+        "exact_question": {
+          "accepted_blocks": 0,
+          "oversize_blocks_skipped": 0
+        },
+        "normalized_question": {
+          "accepted_blocks": 0,
+          "oversize_blocks_skipped": 0
+        },
+        "number_template": {
+          "accepted_blocks": 132,
+          "oversize_blocks_skipped": 0
+        },
+        "shared_rare_token_bigram": {
+          "accepted_blocks": 46429,
+          "oversize_blocks_skipped": 0
+        }
+      },
+      "candidate_fraction_of_all_pairs": 0.0012218888,
+      "candidate_pairs": 163769,
+      "unique_template_token_bigrams": 151898
+    },
+    "grouping_threshold": 0.82,
+    "review_only_pairs": 171,
+    "review_or_group_candidate_pairs": 717,
+    "review_threshold": 0.78,
+    "selection_rationale": "official_v001 경계 pair를 직접 검토했을 때 0.82 부근도 같은 문장 골격과 수치/표현만 바뀐 문제 family였고, 0.90 대비 최대 component가 7에서 8로만 증가해 거대 over-grouping 징후가 없었다. 0.78~0.82는 자동 확정하지 않고 review candidate로 보존한다.",
+    "similarity_method": {
+      "base": "character_ngram_jaccard",
+      "character_ngram_size": 5,
+      "number_template": true,
+      "template": "weighted character Jaccard + token-bigram Jaccard + SequenceMatcher"
+    },
+    "threshold_calibration": [
+      {
+        "candidate_pair_count": 717,
+        "group_size_distribution": {
+          "1": 15289,
+          "2": 415,
+          "3": 55,
+          "4": 13,
+          "5": 3,
+          "6": 1,
+          "8": 2
+        },
+        "largest_group_size": 8,
+        "multi_member_groups": 489,
+        "representative_pairs": [
+          {
+            "left_id": "train-000777",
+            "left_question": "the time taken by a man to row his boat upstream is twice the time taken by him to row the same distance downstream . if the speed of the boat in still water is 39 kmph , find the speed of the stream ?",
+            "right_id": "train-006713",
+            "right_question": "The time taken by Mr. Dhoni to row his boat upstream is twice the time taken by him to row the same distance downstream. If the speed of the boat in still water is 72 kmph, what is the speed of the stream?",
+            "score": 0.780093
+          },
+          {
+            "left_id": "train-006713",
+            "left_question": "The time taken by Mr. Dhoni to row his boat upstream is twice the time taken by him to row the same distance downstream. If the speed of the boat in still water is 72 kmph, what is the speed of the stream?",
+            "right_id": "train-013739",
+            "right_question": "the time taken by a man to row his boat upstream is twice the time taken by him to row the same distance downstream . if the speed of the boat in still water is 36 kmph , find the speed of the stream ?",
+            "score": 0.780093
+          },
+          {
+            "left_id": "train-000002",
+            "left_question": "A lent some money to B for 2 years and Rs. 3000 to C for 4 years on simple interest at the same rate of interest and received Rs. 1980 in all from both of them as interest. The rate of interest per annum is 9%. How much money did A lend to B?",
+            "right_id": "train-000269",
+            "right_question": "A lent Rs. 4000 to B for 2 years and Rs. 2000 to C for 4 years on simple interest at the same rate of interest and received some money in all from both of them as interest. The rate of interest per annum is 13.75%. How much interest did A receive in total?",
+            "score": 0.780321
+          },
+          {
+            "left_id": "train-001543",
+            "left_question": "There are 30 players on a football team. The coach has 8 liters of water. She pours 200 milliliters of water for every player so they can get hydrated. Unfortunately, there was a water spill and 250ml of water was spilled. How much water was left over?",
+            "right_id": "train-002032",
+            "right_question": "There are some players on a football team. The coach has 8 liters of water. She pours 200 milliliters of water for every player so they can get hydrated. Unfortunately, there was a water spill and 250ml of water was spilled. There was 1750ml of water left over. How many players are on the team?",
+            "score": 0.780526
+          },
+          {
+            "left_id": "train-005486",
+            "left_question": "The value of $\\log_{10}{23}$ is between which two consecutive integers $c$ and $d$? Find $c+d$.",
+            "right_id": "train-007911",
+            "right_question": "The value of $\\log_{10}{54883}$ is between the consecutive integers $c$ and $d$. Find $c+d$.",
+            "score": 0.780684
+          },
+          {
+            "left_id": "train-005486",
+            "left_question": "The value of $\\log_{10}{23}$ is between which two consecutive integers $c$ and $d$? Find $c+d$.",
+            "right_id": "train-015467",
+            "right_question": "The value of $\\log_{10}{1458}$ is between the consecutive integers $c$ and $d$. Find $c+d$.",
+            "score": 0.780684
+          },
+          {
+            "left_id": "train-007911",
+            "left_question": "The value of $\\log_{10}{54883}$ is between the consecutive integers $c$ and $d$. Find $c+d$.",
+            "right_id": "train-009187",
+            "right_question": "The value of $\\log_{10}{52789}$ is between which two consecutive integers $c$ and $d$? Find $c+d$.",
+            "score": 0.780684
+          },
+          {
+            "left_id": "train-009187",
+            "left_question": "The value of $\\log_{10}{52789}$ is between which two consecutive integers $c$ and $d$? Find $c+d$.",
+            "right_id": "train-015467",
+            "right_question": "The value of $\\log_{10}{1458}$ is between the consecutive integers $c$ and $d$. Find $c+d$.",
+            "score": 0.780684
+          }
+        ],
+        "singleton_groups": 15289,
+        "threshold": 0.78,
+        "total_groups": 15778
+      },
+      {
+        "candidate_pair_count": 546,
+        "group_size_distribution": {
+          "1": 15556,
+          "2": 322,
+          "3": 35,
+          "4": 8,
+          "5": 4,
+          "8": 2
+        },
+        "largest_group_size": 8,
+        "multi_member_groups": 371,
+        "representative_pairs": [
+          {
+            "left_id": "train-010566",
+            "left_question": "4. Let $a \\triangle b$ and $a \\nabla b$ represent the minimum and maximum of the two numbers $a$ and $b$, respectively. For example, $3 \\triangle 4=3, 3 \\nabla 4=4$. For different natural numbers $x$, the number of possible values for $6 \\triangle[4 \\nabla(x \\triangle 5)]$ is $\\qquad$.",
+            "right_id": "train-015996",
+            "right_question": "2. (10 points) Let $a \\triangle b$ and $a \\nabla b$ represent taking the minimum and maximum of two numbers $a$ and $b$, respectively. For example, $3 \\triangle 4=3, 3 \\nabla 4=4$. For different numbers $x$, the number of possible values for $5 \\nabla[4 \\nabla(x \\triangle 4)]$ is $\\qquad$.",
+            "score": 0.820267
+          },
+          {
+            "left_id": "train-005978",
+            "left_question": "The average age of 15 students of a class is 15 years. Out of these, the average age of 7 students is 14 years and that of the other 7 students is 16 years. What is the age of the 15th student?",
+            "right_id": "train-013404",
+            "right_question": "The average age of 15 students of a class is 15 years. Out of these, the average age of 4 students is 14 years and that of the other 10 students is a certain age. The age of the 15th student is 9 years. What is the average age of the 10 students?",
+            "score": 0.820717
+          },
+          {
+            "left_id": "train-010510",
+            "left_question": "Two trains of equal length are running on parallel lines in the same direction at 46 km/hr and another speed. The faster train catches and completely passes the slower train in 45 seconds. The length of each train is 62.5 meters. What is the speed of the slower train in km/hr?",
+            "right_id": "train-015899",
+            "right_question": "Two trains of equal length are running on parallel lines in the same direction at 47 km/hr and some speed. The faster train passes the slower train in 36 seconds. The length of each train is 55 meters. What is the speed of the slower train?",
+            "score": 0.821441
+          },
+          {
+            "left_id": "train-007293",
+            "left_question": "Cyrus has been contracted to write a 500 page book. On his first day, he writes some pages and twice that amount on the second day. On the third day he is able to write twice the amount that he did on the second day. On the fourth day, he gets writer's block and is only able to write 10 pages. He needs to write 315 more pages. How many pages did he write on the first day?",
+            "right_id": "train-008934",
+            "right_question": "Cyrus has been contracted to write a 500 page book.  On his first day, he writes 25 pages and twice that amount on the second day.  On the third day he is able to write twice the amount that he did on the second day.  On the fourth day, he gets writer's block and is only able to write 10 pages.  How many more pages does he need to write?",
+            "score": 0.821873
+          },
+          {
+            "left_id": "train-000603",
+            "left_question": "A set $\\mathcal{S}$ of distinct positive integers has the following property: for every two integers $x, y$ in $\\mathcal{S},$ the arithmetic mean of the set of values obtained by deleting $x$ and $y$ from $\\mathcal{S}$ is an integer. Given that 1 belongs to $\\mathcal{S}$ and that 1001 is the largest element of $\\mathcal{S},$ what is the greatest number of elements that $\\mathcal{S}$ can have?",
+            "right_id": "train-005854",
+            "right_question": "A set $\\mathcal{T}$ of distinct positive integers has the following property: for every integer $x$ in $\\mathcal{T},$ the arithmetic mean of the set of values obtained by deleting $x$ from $\\mathcal{T}$ is an integer. Given that 1 and 2 belong to $\\mathcal{T}$ and that 1001 is the largest element of $\\mathcal{T},$ what is the greatest number of elements that $\\mathcal{T}$ can have?",
+            "score": 0.822109
+          },
+          {
+            "left_id": "train-005633",
+            "left_question": "A certain bus driver is paid a regular rate of $15 per hour for any number of hours that does not exceed a certain number of hours per week. For any overtime hours worked in excess of that number of hours per week, the bus driver is paid a rate that is 75% higher than his regular rate. Last week the bus driver earned $976 in total compensation and worked 54.32 hours. What is the maximum number of hours per week he can work at his regular rate?",
+            "right_id": "train-009359",
+            "right_question": "A certain bus driver is paid a regular rate of $16 per hour for any number of hours that does not exceed a certain limit per week. For any overtime hours worked in excess of that limit, the bus driver is paid a rate that is 75% higher than his regular rate. Last week the bus driver earned $920 in total compensation and worked 50 hours. What is the limit of hours per week for his regular rate?",
+            "score": 0.822281
+          },
+          {
+            "left_id": "train-007782",
+            "left_question": "There are some calories in a serving of cheese. Rick buys the large blocks that have 16 servings per block. If Rick has already eaten 5 servings of cheese, there are 1210 calories remaining in the block. How many calories are in a serving of cheese?",
+            "right_id": "train-008451",
+            "right_question": "There are 110 calories in a serving of cheese.  Rick buys the large blocks that have 16 servings per block.  If Rick has already eaten 5 servings of cheese, how many calories are remaining in the block?",
+            "score": 0.822318
+          },
+          {
+            "left_id": "train-008514",
+            "left_question": "Students at Highridge High earn 2 points for each correct answer during a quiz bowl If a student correctly answers all the questions in a round, the student is awarded an additional 4 point bonus. They played a total of five rounds each consisting of five questions. If James only missed one question, how many points did he get?",
+            "right_id": "train-009446",
+            "right_question": "Students at Highridge High earn 2 points for each correct answer during a quiz bowl. If a student correctly answers all the questions in a round, the student is awarded an additional 4 point bonus. They played a total of five rounds each consisting of five questions. If James got 66 points, how many questions did he miss?",
+            "score": 0.822389
+          }
+        ],
+        "singleton_groups": 15556,
+        "threshold": 0.82,
+        "total_groups": 15927
+      },
+      {
+        "candidate_pair_count": 433,
+        "group_size_distribution": {
+          "1": 15738,
+          "2": 251,
+          "3": 27,
+          "4": 6,
+          "5": 3,
+          "6": 1,
+          "7": 1
+        },
+        "largest_group_size": 7,
+        "multi_member_groups": 289,
+        "representative_pairs": [
+          {
+            "left_id": "train-007481",
+            "left_question": "Evaluate: $\\frac{10^{-3}5^{-2}}{10^{-5}}$",
+            "right_id": "train-010097",
+            "right_question": "Evaluate: $\\frac{10^{-1}5^2}{10^{-4}}$",
+            "score": 0.860957
+          },
+          {
+            "left_id": "train-013342",
+            "left_question": "My mother celebrated her birthday with a total of 60 guests. Half of the guests are women, 15 are men, and the rest are children. In the middle of the celebration, 1/3 of the men and some children left. 50 people stayed and enjoyed the birthday celebration. How many children left the celebration?",
+            "right_id": "train-013938",
+            "right_question": "My mother celebrated her birthday with a total of 60 guests. Half of the guests are women, 15 are men, and the rest are children. In the middle of the celebration, 1/3 of the men and 5 children left. How many people stayed and enjoyed the birthday celebration?",
+            "score": 0.860975
+          },
+          {
+            "left_id": "train-003681",
+            "left_question": "Jack will have ten times more handball trophies than Michael has right now in three years. If Michael has 30 trophies right now, and the number of his trophies increases by 100 in three years, what's the total number of trophies they'll have altogether after three years?",
+            "right_id": "train-009306",
+            "right_question": "Jack will have fifteen times more handball trophies than Michael has right now in five years. If Michael has 50 trophies right now, and the number of his trophies increases by 150 in five years, what's the total number of trophies they'll have altogether after five years?",
+            "score": 0.861171
+          },
+          {
+            "left_id": "train-005155",
+            "left_question": "In Alaska the commercial Cod fishing season runs from January 1 - August 1 lasting exactly 7 months, or x days on a non-leap year.  Two fishermen are competing against each other to see who can earn more profit.  The first fisherman plans to catch fish at a steady rate of 3 per day for the entire season.  The second fisherman is a novice who will need to start more slowly. He plans to catch only 1 fish per day during the first 30 days, 2 fish per day during the next 60 days, and then 4 fish per day during the remainder of the season.  At the end of the season, how many more fish will be caught by the fisherman who catches the higher number of fish?\nIf we know the answer to the above question is 3, what is the value of unknown variable x?",
+            "right_id": "train-011972",
+            "right_question": "In Alaska the commercial Cod fishing season runs from January 1 - August 1 lasting exactly 7 months, or 213 days on a non-leap year.  Two fishermen are competing against each other to see who can earn more profit.  The first fisherman plans to catch fish at a steady rate of 3 per day for the entire season.  The second fisherman is a novice who will need to start more slowly. He plans to catch only 1 fish per day during the first 30 days, 2 fish per day during the next 60 days, and then 4 fish per day during the remainder of the season.  At the end of the season, how many more fish will be caught by the fisherman who catches the higher number of fish?",
+            "score": 0.86179
+          },
+          {
+            "left_id": "train-005580",
+            "left_question": "Solve for $x$: $5x + 9x = 420 - 12(x - 4)$.",
+            "right_id": "train-014589",
+            "right_question": "Solve for $x$: $6x - 4x = 380 - 10(x + 2)$.",
+            "score": 0.862143
+          },
+          {
+            "left_id": "train-007379",
+            "left_question": "A marketing firm determined that, of 240 households surveyed, 80 used neither brand A nor brand B soap. Some used only brand A soap and for every household that used both brands of soap, 3 used only brand B soap. How many households used only brand A soap if 25 households used both brands of soap?",
+            "right_id": "train-014923",
+            "right_question": "A marketing firm determined that, of 260 households surveyed, some used neither brand A nor brand B soap. 60 used only brand A soap and for every household that used both brands of soap, 3 used only brand B soap. 30 households surveyed used both brands of soap. How many households used neither brand A nor brand B soap?",
+            "score": 0.862684
+          },
+          {
+            "left_id": "train-010515",
+            "left_question": "in 10 years , a will be twice as old as b was 10 years ago . if a is now 6 years older than b the present age of b is",
+            "right_id": "train-015577",
+            "right_question": "in 10 years , a will be twice as old 5 as b was 10 years ago . if a is now 7 years older than b , the present age of b is",
+            "score": 0.8634
+          },
+          {
+            "left_id": "train-010649",
+            "left_question": "Compute the determinant of the following matrix:\n\\[\n\\begin{vmatrix} 8 & 4 \\\\ -2 & 3 \\end{vmatrix}\n\\]",
+            "right_id": "train-016149",
+            "right_question": "Compute the determinant of the following matrix:\n\\[\n\\begin{vmatrix} 7 & -2 \\\\ 6 & 3 \\end{vmatrix}.\n\\]",
+            "score": 0.865512
+          }
+        ],
+        "singleton_groups": 15738,
+        "threshold": 0.86,
+        "total_groups": 16027
+      },
+      {
+        "candidate_pair_count": 343,
+        "group_size_distribution": {
+          "1": 15869,
+          "2": 194,
+          "3": 26,
+          "4": 4,
+          "5": 3,
+          "7": 1
+        },
+        "largest_group_size": 7,
+        "multi_member_groups": 228,
+        "representative_pairs": [
+          {
+            "left_id": "train-003752",
+            "left_question": "On Monday a group of some children and 5 adults went to the zoo. On Tuesday a group of 4 children and 2 adults went as well. Child tickets cost $3, and adult tickets cost $4. The zoo made a total of $61 for both days. How many children went to the zoo on Monday?",
+            "right_id": "train-006477",
+            "right_question": "On Monday a group of 7 children and some adults went to the zoo. On Tuesday a group of 4 children and 2 adults went as well. Child tickets cost $3, and adult tickets cost $4. The zoo made a total of $61 for both days. How many adults went to the zoo on Monday?",
+            "score": 0.900078
+          },
+          {
+            "left_id": "train-000844",
+            "left_question": "The function $g(n)$ is defined on the positive integers such that $g(g(n)) = 3n$ and $g(3n + 2) = 3n + 1$ for all positive integers $n$. Find $g(1000)$.",
+            "right_id": "train-009761",
+            "right_question": "The function $g(n)$ is defined on the positive integers such that $g(g(n)) = 3n$ and $g(3n + 2) = 3n + 1$ for all positive integers $n.$ Find $g(2023).$",
+            "score": 0.900234
+          },
+          {
+            "left_id": "train-004954",
+            "left_question": "if the average ( arithmetic mean ) of ( 2 a + 16 ) and ( 3 a - 8 ) is 79 , what is the value of a ?",
+            "right_id": "train-007001",
+            "right_question": "If the average (arithmetic mean) of (2a + 16) and (3a - 8) is 84, what is the value of a?",
+            "score": 0.901494
+          },
+          {
+            "left_id": "train-005361",
+            "left_question": "if the average ( arithmetic mean ) of ( 2 a + 16 ) and ( 3 a - 8 ) is 69 , what is the value of a ?",
+            "right_id": "train-007001",
+            "right_question": "If the average (arithmetic mean) of (2a + 16) and (3a - 8) is 84, what is the value of a?",
+            "score": 0.901494
+          },
+          {
+            "left_id": "train-008144",
+            "left_question": "The operation $\\star$ is defined as $a \\star b = a^2 \\div b$. Determine for how many integer values of $x$ will the value of $16 \\star x$ be a positive integer.",
+            "right_id": "train-010177",
+            "right_question": "The operation $\\star$ is defined as $a \\star b = a^2 \\div b$. For how many integer values of $x$ will the value of $8 \\star x$ be a positive integer?",
+            "score": 0.901953
+          },
+          {
+            "left_id": "train-005693",
+            "left_question": "Mike is saving up to buy a house.  He puts away 10% of his $150,000 a year salary.  He needs to save up 20% of the cost of a $450,000 house for a downpayment.  How long will it take?",
+            "right_id": "train-009294",
+            "right_question": "Mike is saving up to buy a house. He puts away 10% of his $150,000 a year salary. He needs to save up 20% of the cost of a $450,000 house for a downpayment. How long will it take him to save for the downpayment?",
+            "score": 0.902174
+          },
+          {
+            "left_id": "train-000982",
+            "left_question": "A train running at the speed of 90 km/hr crosses a pole in 5 seconds. What is the length of the train in meters?",
+            "right_id": "train-010463",
+            "right_question": "A train running at the speed of 120 km / hr crosses a pole in 15 seconds. What is the length of the train?",
+            "score": 0.902395
+          },
+          {
+            "left_id": "train-010463",
+            "left_question": "A train running at the speed of 120 km / hr crosses a pole in 15 seconds. What is the length of the train?",
+            "right_id": "train-011734",
+            "right_question": "A train running at the speed of 90 km/hr crosses a pole in 6 seconds. What is the length of the train in meters?",
+            "score": 0.902395
+          }
+        ],
+        "singleton_groups": 15869,
+        "threshold": 0.9,
+        "total_groups": 16097
+      },
+      {
+        "candidate_pair_count": 265,
+        "group_size_distribution": {
+          "1": 15995,
+          "2": 145,
+          "3": 18,
+          "4": 3,
+          "5": 3,
+          "7": 1
+        },
+        "largest_group_size": 7,
+        "multi_member_groups": 170,
+        "representative_pairs": [
+          {
+            "left_id": "train-004344",
+            "left_question": "mixture contains alcohol and water in the ratio 4 : 3 . if 5 liters of water is added to the mixture , the ratio becomes 4 : 5 . find the quantity of alcohol in the given mixture .",
+            "right_id": "train-009897",
+            "right_question": "A mixture contains alcohol and water in the ratio 2 : 5. If 10 liters of water is added to the mixture, the ratio becomes 2 : 7. Find the quantity of alcohol in the given mixture.",
+            "score": 0.940991
+          },
+          {
+            "left_id": "train-002012",
+            "left_question": "The speed of a boat in standing water is 9 kmph and the speed of the stream is 6 kmph. A man rows to a place at a certain distance and comes back to the starting point. The total time taken by him is 84 hours. What is the distance of the place he rows to?",
+            "right_id": "train-006692",
+            "right_question": "The speed of a boat in standing water is 9 kmph, and the speed of the stream is 1.5 kmph. A man rows to a place at a certain distance and comes back to the starting point. The total time taken by him is 48 hours. What is the distance to the place he rows to?",
+            "score": 0.941146
+          },
+          {
+            "left_id": "train-006692",
+            "left_question": "The speed of a boat in standing water is 9 kmph, and the speed of the stream is 1.5 kmph. A man rows to a place at a certain distance and comes back to the starting point. The total time taken by him is 48 hours. What is the distance to the place he rows to?",
+            "right_id": "train-013030",
+            "right_question": "The speed of a boat in standing water is 16 kmph and the speed of the stream is 2 kmph. A man rows to a place at a certain distance and comes back to the starting point. The total time taken by him is 960 hours. What is the distance of the place he rows to?",
+            "score": 0.941146
+          },
+          {
+            "left_id": "train-004629",
+            "left_question": "There are two distinguishable flagpoles, and there are $25$ flags, of which $14$ are identical blue flags, and $11$ are identical green flags. Let $M$ be the number of distinguishable arrangements using all of the flags in which each flagpole has at least one flag and no two green flags on either pole are adjacent. Find the remainder when $M$ is divided by $1000$.",
+            "right_id": "train-009560",
+            "right_question": "There are two distinguishable flagpoles, and there are $25$ flags, of which $14$ are identical blue flags, and $11$ are identical green flags. Let $M$ be the number of distinguishable arrangements using all of the flags in which each flagpole has at least two blue flags and no two green flags on either pole are adjacent. Find the remainder when $M$ is divided by $1000$.",
+            "score": 0.94304
+          },
+          {
+            "left_id": "train-000462",
+            "left_question": "A man whose bowling average is 12.4 takes 3 wickets for a certain number of runs and thereby decreases his average by 0.4. The number of wickets taken by him before his last match is approximately 25. How many runs did he give in his last match?",
+            "right_id": "train-002498",
+            "right_question": "A man whose bowling average is 12.4 takes 6 wickets for a certain number of runs and thereby decreases his average by 0.4. The number of wickets taken by him before his last match is 115. How many runs did he give in his last match?",
+            "score": 0.943371
+          },
+          {
+            "left_id": "train-016125",
+            "left_question": "Jane is shopping for some fruit.  She sees a stand of fruit advertising 10 apples for $2, and another one advertising 5 oranges for $1.50.  Assuming there's no price discount for buying in bulk, how much would Jane spend in cents if she bought 12 of the cheaper of the two fruits?",
+            "right_id": "train-016423",
+            "right_question": "Jane is shopping for some fruit. She sees a stand of fruit advertising 10 apples for $2, and another one advertising 5 oranges for $1.50. Assuming there's no price discount for buying in bulk, how much would Jane spend in cents if she bought a dozen of the cheaper of the two fruits?",
+            "score": 0.943404
+          },
+          {
+            "left_id": "train-001357",
+            "left_question": "The average weight of a group of people increases by 6 kg when a new person comes in place of one of them weighing 40 kg. The weight of the new person might be 88 kg. How many people are in the group?",
+            "right_id": "train-002749",
+            "right_question": "The average weight of a group of people increases by 2 kg when a new person comes in place of one of them weighing 65 kg. The weight of the new person might be 81 kg. How many people are in the group initially?",
+            "score": 0.944537
+          },
+          {
+            "left_id": "train-002749",
+            "left_question": "The average weight of a group of people increases by 2 kg when a new person comes in place of one of them weighing 65 kg. The weight of the new person might be 81 kg. How many people are in the group initially?",
+            "right_id": "train-014438",
+            "right_question": "The average weight of a group of people increases by 2.5 kg when a new person comes in place of one of them weighing 66 kg. The weight of the new person might be 86 kg. How many people are in the group?",
+            "score": 0.944537
+          }
+        ],
+        "singleton_groups": 15995,
+        "threshold": 0.94,
+        "total_groups": 16165
+      }
+    ]
+  },
+  "pipeline_version": "phase2_split_v1",
+  "schema_version": 1,
+  "source": {
+    "dataset_version": "official_v001",
+    "heuristic_suspects_removed": false,
+    "path": "data/processed/official_v001/train_clean.csv",
+    "rows": 16373,
+    "sha256": "4c9d3646e4bf06078122ca4436b1a05b916f267d6c61f2040b9bfba891410d1c"
+  },
+  "split": {
+    "actual_val_ratio": 0.0999816772,
+    "algorithm": "seeded_greedy_whole_group_target_v1",
+    "seed": 2026,
+    "target_val_ratio": 0.1,
+    "train_rows": 14736,
+    "train_val_group_overlap": 0,
+    "train_val_id_overlap": 0,
+    "val_rows": 1637
+  },
+  "split_version": "official_v001_split_v001"
+}

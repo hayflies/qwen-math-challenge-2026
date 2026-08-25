@@ -4,7 +4,7 @@ experiment:
   experiment_id: E000
   phase: 3
   model: Qwen/Qwen2.5-3B-Instruct
-  checkpoint: Qwen/Qwen2.5-3B-Instruct@main
+  checkpoint: Qwen/Qwen2.5-3B-Instruct@aa8e72537993ba99e69dfaafa59ed015b17504d1
   dataset_version: official_v001
   train_samples: 0
   validation_split: official_v001_split_v001
@@ -34,8 +34,8 @@ runtime:
 
 model:
   name_or_path: Qwen/Qwen2.5-3B-Instruct
-  revision: main
-  tokenizer_revision: main
+  revision: aa8e72537993ba99e69dfaafa59ed015b17504d1
+  tokenizer_revision: aa8e72537993ba99e69dfaafa59ed015b17504d1
   local_files_only: true
   trust_remote_code: false
 

@@ -23,7 +23,7 @@ from qwen_math_challenge.data.official import sha256_file
 
 ALLOWED_MODEL_ID = "Qwen/Qwen2.5-3B-Instruct"
 ANSWER_PARSER_VERSION = "integer_v001"
-PIPELINE_VERSION = "phase3_e000_v1"
+PIPELINE_VERSION = "phase3_e000_v2"
 PREDICTION_COLUMNS = (
     "id",
     "question",
@@ -213,10 +213,13 @@ class BatchGenerator(Protocol):
     tokenizer_commit: str
     chat_template: str
     device_spec: DeviceSpec
+    model_load_time_sec: float
 
     def render_prompt(self, question: str) -> str: ...
 
     def generate(self, questions: Sequence[str]) -> Sequence[GenerationResult]: ...
+
+    def runtime_metadata(self) -> Mapping[str, Any]: ...
 
 
 def _require_mapping(value: object, label: str) -> dict[str, Any]:
@@ -689,6 +692,9 @@ class TransformersBatchGenerator:
         self._torch = torch
         self._settings = settings
         self.device_spec = device_spec
+        if device_spec.device == "cuda":
+            torch.cuda.reset_peak_memory_stats()
+        load_started = time.perf_counter()
         try:
             self._tokenizer = AutoTokenizer.from_pretrained(
                 snapshot.path,
@@ -712,7 +718,7 @@ class TransformersBatchGenerator:
                 snapshot.path,
                 local_files_only=True,
                 trust_remote_code=False,
-                torch_dtype=_torch_dtype(torch, device_spec.dtype),
+                dtype=_torch_dtype(torch, device_spec.dtype),
                 low_cpu_mem_usage=True,
             )
         except OSError as exc:
@@ -733,6 +739,32 @@ class TransformersBatchGenerator:
         self.tokenizer_commit = str(
             getattr(self._tokenizer, "_commit_hash", None) or snapshot.commit_hash
         )
+        self.model_load_time_sec = time.perf_counter() - load_started
+
+    def runtime_metadata(self) -> dict[str, Any]:
+        """Return hardware and peak-memory facts without changing generation behavior."""
+
+        metadata: dict[str, Any] = {
+            "device": self.device_spec.device,
+            "device_name": self.device_spec.name,
+            "dtype": self.device_spec.dtype,
+            "model_load_time_sec": round(self.model_load_time_sec, 8),
+        }
+        if self.device_spec.device != "cuda":
+            return metadata
+
+        index = self._torch.cuda.current_device()
+        properties = self._torch.cuda.get_device_properties(index)
+        metadata["cuda"] = {
+            "torch_cuda_version": self._torch.version.cuda,
+            "gpu_name": self._torch.cuda.get_device_name(index),
+            "total_vram_bytes": int(properties.total_memory),
+            "capability": list(self._torch.cuda.get_device_capability(index)),
+            "bf16_supported": bool(self._torch.cuda.is_bf16_supported()),
+            "peak_allocated_bytes": int(self._torch.cuda.max_memory_allocated(index)),
+            "peak_reserved_bytes": int(self._torch.cuda.max_memory_reserved(index)),
+        }
+        return metadata
 
     def render_prompt(self, question: str) -> str:
         return render_chat_prompt(self._tokenizer, question, self._settings.prompt)
@@ -957,12 +989,13 @@ def _load_resume_records(
 
 def _summary(values: Sequence[float | int]) -> dict[str, float | int | None]:
     if not values:
-        return {"mean": None, "median": None, "p95": None, "max": None}
+        return {"mean": None, "median": None, "p95": None, "p99": None, "max": None}
     array = np.asarray(values, dtype=np.float64)
     return {
         "mean": round(float(array.mean()), 8),
         "median": round(float(np.median(array)), 8),
         "p95": round(float(np.percentile(array, 95)), 8),
+        "p99": round(float(np.percentile(array, 99)), 8),
         "max": round(float(array.max()), 8),
     }
 
@@ -991,6 +1024,23 @@ def aggregate_metrics(
             "accuracy": round(category_correct / len(members), 10),
             "parse_failures": category_parse_failures,
         }
+    answer_sign_records = {
+        "negative": [record for record in records if record.gold_answer < 0],
+        "zero": [record for record in records if record.gold_answer == 0],
+        "positive": [record for record in records if record.gold_answer > 0],
+    }
+    per_answer_sign = {}
+    for sign, members in answer_sign_records.items():
+        sign_correct = sum(record.correct for record in members)
+        sign_parse_failures = sum(
+            record.parse_status.startswith("parse_failure") for record in members
+        )
+        per_answer_sign[sign] = {
+            "total": len(members),
+            "correct": sign_correct,
+            "accuracy": round(sign_correct / len(members), 10) if members else None,
+            "parse_failures": sign_parse_failures,
+        }
     return {
         "metric": "integer_exact_match",
         "answer_parser_version": ANSWER_PARSER_VERSION,
@@ -1001,6 +1051,7 @@ def aggregate_metrics(
         "accuracy": round(correct / total, 10) if total else 0.0,
         "parse_failure_rate": round(parse_failures / total, 10) if total else 0.0,
         "per_category": per_category,
+        "per_answer_sign": per_answer_sign,
         "category_labels_derived_not_gold": True,
         "input_token_statistics": _summary([record.input_tokens for record in records]),
         "output_token_statistics": _summary([record.output_tokens for record in records]),
@@ -1008,6 +1059,9 @@ def aggregate_metrics(
         "total_wall_clock_sec": round(total_wall_clock_sec, 8),
         "finish_reason_counts": dict(sorted(Counter(r.finish_reason for r in records).items())),
         "truncated": sum(record.truncated for record in records),
+        "max_new_tokens_hits": sum(record.finish_reason == "max_new_tokens" for record in records),
+        "empty_outputs": sum(not record.raw_output.strip() for record in records),
+        "generation_failures": 0,
         "truncation_rate": round(sum(record.truncated for record in records) / total, 10)
         if total
         else 0.0,
@@ -1088,6 +1142,7 @@ def run_zero_shot_evaluation(
     failures_path = output_dir / settings.output.failures_filename
     _write_prediction_rows(failures_path, failures)
     metrics = aggregate_metrics(final_records, total_wall_clock_sec=total_wall_clock)
+    metrics["runtime"] = dict(generator.runtime_metadata())
     metrics.update(
         {
             "schema_version": 1,
@@ -1154,6 +1209,7 @@ def build_run_manifest_fields(
         "device": generator.device_spec.device,
         "device_name": generator.device_spec.name,
         "dtype": generator.device_spec.dtype,
+        "runtime": dict(generator.runtime_metadata()),
         "python_version": platform.python_version(),
         "torch_version": torch_version,
         "transformers_version": transformers_version,

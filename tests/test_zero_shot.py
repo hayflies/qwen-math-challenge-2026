@@ -134,6 +134,7 @@ class FakeGenerator:
     tokenizer_commit = "tokenizer-commit-123"
     chat_template = "fake official template"
     device_spec = DeviceSpec(device="cpu", dtype="float32", name="Fake CPU")
+    model_load_time_sec = 0.25
 
     def __init__(self) -> None:
         self.calls: list[list[str]] = []
@@ -162,6 +163,14 @@ class FakeGenerator:
             )
             for index, question in enumerate(questions)
         ]
+
+    def runtime_metadata(self):
+        return {
+            "device": "cpu",
+            "device_name": "Fake CPU",
+            "dtype": "float32",
+            "model_load_time_sec": self.model_load_time_sec,
+        }
 
 
 def _load_fixture(tmp_path: Path, **kwargs):
@@ -441,6 +450,8 @@ def test_metrics_include_token_latency_and_truncation_statistics() -> None:
     assert "input_token_statistics" in metrics
     assert "output_token_statistics" in metrics
     assert "latency_sec_statistics" in metrics
+    assert "p99" in metrics["latency_sec_statistics"]
+    assert set(metrics["per_answer_sign"]) == {"negative", "zero", "positive"}
     assert metrics["truncated"] == 0
 
 

@@ -1,0 +1,9 @@
+group,count,correct,incorrect,accuracy,parse_failures,parse_failure_rate,max_token_hits,max_token_hit_rate
+algebra,85,46,39,0.5411764706,1,0.0117647059,9,0.1058823529
+calculus,1,1,0,1.0,0,0.0,0,0.0
+combinatorics,6,1,5,0.1666666667,0,0.0,0,0.0
+geometry,72,25,47,0.3472222222,1,0.0138888889,4,0.0555555556
+number_theory,80,29,51,0.3625,0,0.0,5,0.0625
+probability,16,9,7,0.5625,0,0.0,3,0.1875
+unknown,1227,852,375,0.6943765281,4,0.0032599837,56,0.0456397718
+word_problem,150,112,38,0.7466666667,0,0.0,1,0.0066666667

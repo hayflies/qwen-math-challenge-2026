@@ -39,6 +39,7 @@ identity:
     do_sample: false
     num_beams: 1
     max_new_tokens: 1024
+    use_cache: true
     batch_size: 1
 
 canonical_run:
@@ -88,7 +89,17 @@ canonical_archive:
   preservation_confirmed: true
   local_import_candidate: E000_20260828_canonical_artifacts.tar.gz
   present_in_local_repository: true
-  locally_hash_verified: false
+  locally_hash_verified: true
+  integrity_verified_date: "2026-08-30"
+  internal_artifact_sha256:
+    config.snapshot.yaml: f2d6d851d263466ee32fbdeabf70be326a0ff5a63f1e63e0376bf7bc10daaaea
+    environment.json: 1aa6f2f9ab7bdc453bb2123302f6d976ea7a7b14ae13389fcd5148597059e156
+    failures.csv: e307419211ff78c5a47d0163e22e58d72d8907a7876e1003e8fde11c3392766d
+    metrics.json: 7b16a7c94f983d496bd8b9968759bae862d32af9b2ba66aee397830651814312
+    predictions.csv: 98b3f4146fd84e3387659eed16a7bd69b8acc3dfb304c598f2210138379aac26
+    resume_identity.json: 853fb6fff6c0ccabeee4d5b53af63f011b2c4a304d5de614526d0461660588b5
+    run.log: 4818b772c816f96987fc63a96dc41841d0b42fe2e8b5ea7f3f3cc6f8f3338288
+    run_manifest.json: e7d9fd5efb3a383357182765cdddac75e02283b15001707e8b46e38c721a69bc
 
 local_verification:
   checked_date: "2026-08-30"
@@ -99,11 +110,22 @@ local_verification:
   validation_row_count_matches: true
   canonical_run_directory_present: false
   canonical_archive_present: true
-  row_level_metrics_recomputed_locally: false
+  row_level_metrics_recomputed_locally: true
+  identity_validation_status: PASS
+  predictions_integrity_status: PASS
+  recomputed_accuracy: 0.6566890653634697
+  kaggle_runtime_git_dirty: true
   limitation: >-
-    A local archive import candidate is present but has not yet passed the expected SHA-256
-    and internal integrity checks. Its contents and per-file hashes were not assumed,
-    invented, or reconstructed for this freeze record.
+    The archive was extracted only to a safe temporary directory for validation. The Kaggle
+    runtime recorded the frozen code commit with git_dirty=true; all frozen identity fields
+    and registered artifact hashes nevertheless match, and no prediction was reconstructed.
+
+post_analysis:
+  analysis_version: e000_error_analysis_v001
+  manifest: analysis/e000/analysis_manifest.json
+  report: analysis/e000/error_analysis.json
+  source_predictions_modified: false
+  phase4_started: false
 
 pre_cuda_smoke_evidence:
   canonical_metric: false
@@ -130,12 +152,6 @@ phase3_gate:
     unexecuted; local ingestion remains a provenance-strengthening follow-up.
 
 analysis_todo_before_phase4_design:
-  - Verify the local canonical archive candidate against its reported SHA-256 before extraction.
-  - Verify internal artifact hashes and predictions row count from the retrieved archive.
-  - Analyze the 562 wrong but parseable or otherwise incorrect predictions.
-  - Inspect and classify all 6 parse failures without changing integer_v001 retrospectively.
-  - Analyze all 78 max_new_tokens hits and their correctness/truncation relationship.
-  - Compute derived-category accuracy; labels remain heuristic rather than gold taxonomy.
-  - Compute negative, zero, and positive answer accuracy.
-  - Analyze reasoning/output length versus correctness.
-  - Decide whether Phase 4 design should respond to observed failure modes without changing E000.
+  - Manually review deterministic representative samples before selecting Phase 4 interventions.
+  - Decide whether to prioritize direct-answer SFT or a separate versioned truncation experiment.
+  - Keep any future parser proposal versioned; never rewrite canonical integer_v001 metrics.

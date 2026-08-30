@@ -114,7 +114,16 @@ failure는 6건이다. 최종 run은 호환성 검사를 통과한 completed pre
 
 정확한 identity, metric, artifact 보존 위치, 로컬 검증 범위와 후속 분석 TODO는
 [`experiments/e000_zero_shot.yaml`](experiments/e000_zero_shot.yaml)에 동결한다. canonical
-archive는 Kaggle Notebook Version 1 Output에 보존되어 있고, 현재 repository root에도 import
-후보가 있으나 별도 integrity 검증 전에는 신뢰하지 않는다. 기존 MPS 1문항/5문항 결과는
-pre-CUDA smoke evidence로 `outputs/`에 그대로 유지하며 canonical full metric으로 사용하지
-않는다.
+archive는 Kaggle Notebook Version 1 Output에 보존되어 있고, repository root의 import본도
+기대 SHA-256, 내부 artifact hash, identity와 1,637행 metric integrity 검증을 통과했다. 검증 및
+사후분석 결과는 [`analysis/e000/analysis_manifest.json`](analysis/e000/analysis_manifest.json)에
+기록한다. 기존 MPS 1문항/5문항 결과는 pre-CUDA smoke evidence로 `outputs/`에 그대로
+유지하며 canonical full metric으로 사용하지 않는다.
+
+Canonical archive를 재검증하고 동일 분석 산출물을 만들려면 다음을 실행한다.
+
+```bash
+uv run --frozen --no-sync python scripts/analyze_e000.py \
+  --archive E000_20260828_canonical_artifacts.tar.gz \
+  --output-dir analysis/e000
+```

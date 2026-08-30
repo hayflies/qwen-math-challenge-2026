@@ -48,6 +48,7 @@ htmlcov/
 # Run outputs, caches, and model weights
 /outputs/**
 !/outputs/.gitkeep
+/E000_*_canonical_artifacts.tar.gz
 /wandb/
 /runs/
 *.safetensors

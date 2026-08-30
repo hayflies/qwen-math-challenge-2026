@@ -1,0 +1,4 @@
+group,count,correct,incorrect,accuracy,parse_failures,parse_failure_rate,max_token_hits,max_token_hit_rate
+negative,52,36,16,0.6923076923,1,0.0192307692,2,0.0384615385
+positive,1576,1032,544,0.654822335,5,0.0031725888,76,0.0482233503
+zero,9,7,2,0.7777777778,0,0.0,0,0.0

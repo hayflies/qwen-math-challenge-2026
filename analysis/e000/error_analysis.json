@@ -1,0 +1,371 @@
+{
+  "answer_sign_metrics": [
+    {
+      "accuracy": 0.6923076923,
+      "correct": 36,
+      "count": 52,
+      "group": "negative",
+      "incorrect": 16,
+      "max_token_hit_rate": 0.0384615385,
+      "max_token_hits": 2,
+      "parse_failure_rate": 0.0192307692,
+      "parse_failures": 1
+    },
+    {
+      "accuracy": 0.654822335,
+      "correct": 1032,
+      "count": 1576,
+      "group": "positive",
+      "incorrect": 544,
+      "max_token_hit_rate": 0.0482233503,
+      "max_token_hits": 76,
+      "parse_failure_rate": 0.0031725888,
+      "parse_failures": 5
+    },
+    {
+      "accuracy": 0.7777777778,
+      "correct": 7,
+      "count": 9,
+      "group": "zero",
+      "incorrect": 2,
+      "max_token_hit_rate": 0.0,
+      "max_token_hits": 0,
+      "parse_failure_rate": 0.0,
+      "parse_failures": 0
+    }
+  ],
+  "category_labels_derived_not_gold": true,
+  "category_metrics": [
+    {
+      "accuracy": 0.5411764706,
+      "correct": 46,
+      "count": 85,
+      "group": "algebra",
+      "incorrect": 39,
+      "max_token_hit_rate": 0.1058823529,
+      "max_token_hits": 9,
+      "parse_failure_rate": 0.0117647059,
+      "parse_failures": 1
+    },
+    {
+      "accuracy": 1.0,
+      "correct": 1,
+      "count": 1,
+      "group": "calculus",
+      "incorrect": 0,
+      "max_token_hit_rate": 0.0,
+      "max_token_hits": 0,
+      "parse_failure_rate": 0.0,
+      "parse_failures": 0
+    },
+    {
+      "accuracy": 0.1666666667,
+      "correct": 1,
+      "count": 6,
+      "group": "combinatorics",
+      "incorrect": 5,
+      "max_token_hit_rate": 0.0,
+      "max_token_hits": 0,
+      "parse_failure_rate": 0.0,
+      "parse_failures": 0
+    },
+    {
+      "accuracy": 0.3472222222,
+      "correct": 25,
+      "count": 72,
+      "group": "geometry",
+      "incorrect": 47,
+      "max_token_hit_rate": 0.0555555556,
+      "max_token_hits": 4,
+      "parse_failure_rate": 0.0138888889,
+      "parse_failures": 1
+    },
+    {
+      "accuracy": 0.3625,
+      "correct": 29,
+      "count": 80,
+      "group": "number_theory",
+      "incorrect": 51,
+      "max_token_hit_rate": 0.0625,
+      "max_token_hits": 5,
+      "parse_failure_rate": 0.0,
+      "parse_failures": 0
+    },
+    {
+      "accuracy": 0.5625,
+      "correct": 9,
+      "count": 16,
+      "group": "probability",
+      "incorrect": 7,
+      "max_token_hit_rate": 0.1875,
+      "max_token_hits": 3,
+      "parse_failure_rate": 0.0,
+      "parse_failures": 0
+    },
+    {
+      "accuracy": 0.6943765281,
+      "correct": 852,
+      "count": 1227,
+      "group": "unknown",
+      "incorrect": 375,
+      "max_token_hit_rate": 0.0456397718,
+      "max_token_hits": 56,
+      "parse_failure_rate": 0.0032599837,
+      "parse_failures": 4
+    },
+    {
+      "accuracy": 0.7466666667,
+      "correct": 112,
+      "count": 150,
+      "group": "word_problem",
+      "incorrect": 38,
+      "max_token_hit_rate": 0.0066666667,
+      "max_token_hits": 1,
+      "parse_failure_rate": 0.0,
+      "parse_failures": 0
+    }
+  ],
+  "correct_vs_incorrect": {
+    "correct": {
+      "count": 1075,
+      "input_tokens": {
+        "max": 572.0,
+        "mean": 100.3627907,
+        "median": 94.0,
+        "p95": 149.0
+      },
+      "latency_sec": {
+        "max": 47.58420398,
+        "mean": 11.06306909,
+        "median": 8.54359408,
+        "p95": 30.14350744
+      },
+      "max_token_hits": 4,
+      "output_tokens": {
+        "max": 1024.0,
+        "mean": 235.57488372,
+        "median": 179.0,
+        "p95": 650.9
+      },
+      "parse_failures": 0,
+      "question_character_length": {
+        "max": 1205.0,
+        "mean": 207.90604651,
+        "median": 190.0,
+        "p95": 410.0
+      }
+    },
+    "incorrect": {
+      "count": 562,
+      "input_tokens": {
+        "max": 846.0,
+        "mean": 127.47508897,
+        "median": 114.0,
+        "p95": 222.95
+      },
+      "latency_sec": {
+        "max": 49.56285011,
+        "mean": 24.43418941,
+        "median": 22.1858387,
+        "p95": 47.2773324
+      },
+      "max_token_hits": 74,
+      "output_tokens": {
+        "max": 1024.0,
+        "mean": 527.13523132,
+        "median": 476.0,
+        "p95": 1024.0
+      },
+      "parse_failures": 6,
+      "question_character_length": {
+        "max": 1951.0,
+        "mean": 281.886121,
+        "median": 235.5,
+        "p95": 619.3
+      }
+    }
+  },
+  "max_token_form_counts": {
+    "explicit_answer_present_before_limit": 1,
+    "reasoning_cut_off_with_fallback_integer": 76,
+    "repetitive_output_candidate": 1
+  },
+  "max_token_metrics": [
+    {
+      "accuracy": 0.0512820513,
+      "correct": 4,
+      "count": 78,
+      "group": "max_token_hit",
+      "incorrect": 74,
+      "max_token_hit_rate": 1.0,
+      "max_token_hits": 78,
+      "parse_failure_rate": 0.0,
+      "parse_failures": 0
+    },
+    {
+      "accuracy": 0.6869788326,
+      "correct": 1071,
+      "count": 1559,
+      "group": "non_hit",
+      "incorrect": 488,
+      "max_token_hit_rate": 0.0,
+      "max_token_hits": 0,
+      "parse_failure_rate": 0.0038486209,
+      "parse_failures": 6
+    }
+  ],
+  "non_hit_count": 1559,
+  "output_length_boundaries": [
+    147,
+    234,
+    445,
+    1011,
+    1023
+  ],
+  "output_length_boundary_rationale": "Empirical p25/p50/p75/p95 nearest-rank boundaries plus a separate max-token bucket.",
+  "output_length_metrics": [
+    {
+      "accuracy": 0.9184652278,
+      "correct": 383,
+      "count": 417,
+      "group": "0000-0147",
+      "incorrect": 34,
+      "max_token_hit_rate": 0.0,
+      "max_token_hits": 0,
+      "parse_failure_rate": 0.0,
+      "parse_failures": 0
+    },
+    {
+      "accuracy": 0.8337468983,
+      "correct": 336,
+      "count": 403,
+      "group": "0148-0234",
+      "incorrect": 67,
+      "max_token_hit_rate": 0.0,
+      "max_token_hits": 0,
+      "parse_failure_rate": 0.0,
+      "parse_failures": 0
+    },
+    {
+      "accuracy": 0.6004901961,
+      "correct": 245,
+      "count": 408,
+      "group": "0235-0445",
+      "incorrect": 163,
+      "max_token_hit_rate": 0.0,
+      "max_token_hits": 0,
+      "parse_failure_rate": 0.0049019608,
+      "parse_failures": 2
+    },
+    {
+      "accuracy": 0.3262195122,
+      "correct": 107,
+      "count": 328,
+      "group": "0446-1011",
+      "incorrect": 221,
+      "max_token_hit_rate": 0.0,
+      "max_token_hits": 0,
+      "parse_failure_rate": 0.012195122,
+      "parse_failures": 4
+    },
+    {
+      "accuracy": 0.0,
+      "correct": 0,
+      "count": 2,
+      "group": "1012-1023",
+      "incorrect": 2,
+      "max_token_hit_rate": 0.0,
+      "max_token_hits": 0,
+      "parse_failure_rate": 0.0,
+      "parse_failures": 0
+    },
+    {
+      "accuracy": 0.0506329114,
+      "correct": 4,
+      "count": 79,
+      "group": "1024",
+      "incorrect": 75,
+      "max_token_hit_rate": 0.9873417722,
+      "max_token_hits": 78,
+      "parse_failure_rate": 0.0,
+      "parse_failures": 0
+    }
+  ],
+  "parse_failure_reason_counts": {
+    "conflicting_final_answers": 6
+  },
+  "phase1_suspect_metrics": [
+    {
+      "accuracy": 0.6574585635,
+      "correct": 1071,
+      "count": 1629,
+      "group": "non_suspect",
+      "incorrect": 558,
+      "max_token_hit_rate": 0.0472682627,
+      "max_token_hits": 77,
+      "parse_failure_rate": 0.0036832413,
+      "parse_failures": 6
+    },
+    {
+      "accuracy": 0.5,
+      "correct": 4,
+      "count": 8,
+      "group": "phase1_suspect",
+      "incorrect": 4,
+      "max_token_hit_rate": 0.125,
+      "max_token_hits": 1,
+      "parse_failure_rate": 0.0,
+      "parse_failures": 0
+    }
+  ],
+  "phase1_suspect_validation_count": 8,
+  "phase1_suspect_validation_reason_counts": {
+    "abnormal_character_pattern_candidate": 5,
+    "latex_or_markup_anomaly_candidate": 3
+  },
+  "phase4_hypotheses": [
+    {
+      "caution": "Categories are heuristic and small groups require controlled validation.",
+      "evidence": {
+        "algebra": 0.5411764706,
+        "combinatorics": 0.1666666667,
+        "geometry": 0.3472222222,
+        "number_theory": 0.3625
+      },
+      "hypothesis": "Official direct-answer SFT may improve weak zero-shot categories.",
+      "id": "H1"
+    },
+    {
+      "caution": "This observational association does not prove that a larger token cap fixes reasoning.",
+      "evidence": {
+        "max_token_hit_accuracy": 0.0512820513,
+        "max_token_hit_count": 78,
+        "non_hit_accuracy": 0.6869788326
+      },
+      "hypothesis": "Max-token generation is a major E000 failure correlate.",
+      "id": "H2"
+    },
+    {
+      "caution": "Parser changes require a new version and cannot alter canonical E000 retrospectively.",
+      "evidence": {
+        "fraction_of_all_samples": 0.0036652413,
+        "maximum_possible_accuracy_point_recovery": 0.366524,
+        "parse_failures": 6
+      },
+      "hypothesis": "Parser failures are not the primary overall Accuracy bottleneck.",
+      "id": "H3"
+    }
+  ],
+  "taxonomy_counts": {
+    "max_token_related": 74,
+    "parse_failure": 6,
+    "unusually_long_reasoning": 4,
+    "unusually_short_reasoning": 15,
+    "well_formed_wrong_answer": 463
+  },
+  "taxonomy_policy": "Mutually exclusive deterministic precedence: parse failure, max-token hit, unusually long, unusually short, otherwise well-formed wrong. Arithmetic, reasoning, and dataset ambiguity are manual-review candidates only.",
+  "taxonomy_thresholds": {
+    "output_tokens_p10": 94,
+    "output_tokens_p95": 1011
+  }
+}

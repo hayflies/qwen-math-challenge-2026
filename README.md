@@ -104,3 +104,17 @@ prompt, generation config, parser, limit 또는 config hash가 다르면 resume�
 기본값은 공식 tokenizer chat template, greedy decoding, `max_new_tokens=1024`, batch size
 1이다. 출력에는 token/latency, finish reason, truncation, raw generation과 parser 결과를 함께
 보존한다. 문제 풀이용 Python/SymPy/calculator/tool은 사용하지 않는다.
+
+### Phase 3 동결 상태
+
+Phase 3 Gate는 Kaggle CUDA에서 완료한 canonical full E000을 근거로 **PASS**다. 고정
+validation 1,637문항에서 1,075문항을 맞혀 Accuracy `0.6566890654`를 기록했고 parse
+failure는 6건이다. 최종 run은 호환성 검사를 통과한 completed prefix에서 resume했으며,
+78건이 `max_new_tokens=1024`에 도달했다. 설정을 소급 변경하거나 재측정하지 않는다.
+
+정확한 identity, metric, artifact 보존 위치, 로컬 검증 범위와 후속 분석 TODO는
+[`experiments/e000_zero_shot.yaml`](experiments/e000_zero_shot.yaml)에 동결한다. canonical
+archive는 Kaggle Notebook Version 1 Output에 보존되어 있고, 현재 repository root에도 import
+후보가 있으나 별도 integrity 검증 전에는 신뢰하지 않는다. 기존 MPS 1문항/5문항 결과는
+pre-CUDA smoke evidence로 `outputs/`에 그대로 유지하며 canonical full metric으로 사용하지
+않는다.

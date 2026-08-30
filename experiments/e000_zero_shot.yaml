@@ -1,0 +1,141 @@
+schema_version: 1
+record_version: e000_freeze_v001
+frozen_date: "2026-08-30"
+
+experiment:
+  experiment_id: E000
+  phase: 3
+  gate_status: PASS
+  model: Qwen/Qwen2.5-3B-Instruct
+  checkpoint: Qwen/Qwen2.5-3B-Instruct@aa8e72537993ba99e69dfaafa59ed015b17504d1
+  dataset_version: official_v001
+  train_samples: 0
+  validation_split: official_v001_split_v001
+  external_datasets: []
+  seed: 2026
+  batch_size: 1
+  prompt_template: zero_shot_v001
+  inference_config: greedy_v001
+  parser_version: integer_v001
+  local_validation_score: 0.6566890654
+  per_category_scores: null
+  leaderboard_score: null
+  notes: >-
+    Canonical zero-shot full validation result produced on Kaggle CUDA. No training,
+    external data, inference tools, or alternate model was used.
+
+identity:
+  code_commit: e353afaae07dfd365a5b2ff5e5d3e6442351f45a
+  model_revision: aa8e72537993ba99e69dfaafa59ed015b17504d1
+  tokenizer_revision: aa8e72537993ba99e69dfaafa59ed015b17504d1
+  validation_rows: 1637
+  validation_sha256: cbf48fc75ed858795fa99cf15bd9de736465ba590d5752784af7de6b13c5a40c
+  config_sha256: f2d6d851d263466ee32fbdeabf70be326a0ff5a63f1e63e0376bf7bc10daaaea
+  prompt_version: zero_shot_v001
+  generation_version: greedy_v001
+  parser_version: integer_v001
+  pipeline_version: phase3_e000_v2
+  generation:
+    do_sample: false
+    num_beams: 1
+    max_new_tokens: 1024
+    batch_size: 1
+
+canonical_run:
+  run_id: 20260828T013619074827Z_f2d6d851
+  status: completed
+  complete: true
+  provider: Kaggle
+  notebook_version: 1
+  device: cuda
+  accelerator: Tesla T4
+  dtype: bfloat16
+  batch_size: 1
+  resume:
+    used: true
+    identity_compatibility_validated: true
+    interpretation: >-
+      A compatible completed prediction prefix was reused after Kaggle session interruption;
+      this is one continuous canonical experiment, not mixed-result contamination.
+  metrics:
+    total: 1637
+    correct: 1075
+    incorrect: 562
+    accuracy: 0.6566890654
+    accuracy_percent: 65.66890654
+    parse_failures: 6
+    parse_failure_rate: 0.0036652413
+    parse_failure_percent: 0.36652413
+    max_new_tokens_hits: 78
+    max_new_tokens_hit_rate: 0.0476481368
+    max_new_tokens_hit_percent: 4.76481368
+  artifact_directory: outputs/e000_zero_shot/E000/20260828T013619074827Z_f2d6d851
+  registered_artifacts:
+    - predictions.csv
+    - failures.csv
+    - metrics.json
+    - run_manifest.json
+    - resume_identity.json
+    - environment.json
+    - config.snapshot.yaml
+    - run.log
+
+canonical_archive:
+  filename: E000_20260828_canonical_artifacts.tar.gz
+  reported_size: approximately 885.46 kB
+  reported_sha256: dbb1110d42a6f153e2af47e10b458ef8a981717d3afba8f6f6c1c4d1c8e64e7b
+  preserved_at: Kaggle Notebook Version 1 Output
+  preservation_confirmed: true
+  local_import_candidate: E000_20260828_canonical_artifacts.tar.gz
+  present_in_local_repository: true
+  locally_hash_verified: false
+
+local_verification:
+  checked_date: "2026-08-30"
+  head_matches_execution_commit: true
+  working_tree_was_clean_before_freeze_update: true
+  config_sha256_matches: true
+  validation_sha256_matches: true
+  validation_row_count_matches: true
+  canonical_run_directory_present: false
+  canonical_archive_present: true
+  row_level_metrics_recomputed_locally: false
+  limitation: >-
+    A local archive import candidate is present but has not yet passed the expected SHA-256
+    and internal integrity checks. Its contents and per-file hashes were not assumed,
+    invented, or reconstructed for this freeze record.
+
+pre_cuda_smoke_evidence:
+  canonical_metric: false
+  device: mps
+  dtype: float16
+  preserved_locally: true
+  runs:
+    - run_id: 20260825T000425645781Z_f2d6d851
+      role: one_sample_sanity
+      samples: 1
+    - run_id: 20260825T001357736206Z_f2d6d851
+      role: clean_commit_five_sample_smoke
+      samples: 5
+  note: >-
+    These runs are retained only as pre-CUDA pipeline evidence and are not the canonical
+    full-validation metric.
+
+phase3_gate:
+  status: PASS
+  rationale: >-
+    The exact frozen model/config/validation identity completed all 1,637 predictions on
+    Kaggle, produced the required result and failure artifacts, and is preserved as a hashed
+    canonical archive. Local absence of the archive does not make the recorded Kaggle run
+    unexecuted; local ingestion remains a provenance-strengthening follow-up.
+
+analysis_todo_before_phase4_design:
+  - Verify the local canonical archive candidate against its reported SHA-256 before extraction.
+  - Verify internal artifact hashes and predictions row count from the retrieved archive.
+  - Analyze the 562 wrong but parseable or otherwise incorrect predictions.
+  - Inspect and classify all 6 parse failures without changing integer_v001 retrospectively.
+  - Analyze all 78 max_new_tokens hits and their correctness/truncation relationship.
+  - Compute derived-category accuracy; labels remain heuristic rather than gold taxonomy.
+  - Compute negative, zero, and positive answer accuracy.
+  - Analyze reasoning/output length versus correctness.
+  - Decide whether Phase 4 design should respond to observed failure modes without changing E000.

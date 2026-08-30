@@ -69,8 +69,9 @@ training:
     bias: none
     task_type: CAUSAL_LM
     expected_trainable_parameters: 29933568
-    expected_total_parameters_with_adapter: 3427037184
-    expected_trainable_percentage: 0.8734532599
+    expected_frozen_parameters: 3085938688
+    expected_total_parameters_with_adapter: 3115872256
+    expected_trainable_percentage: 0.96068021
   optimizer: paged_adamw_8bit
   learning_rate: 0.0002
   weight_decay: 0.0

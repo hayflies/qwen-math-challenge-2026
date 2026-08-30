@@ -34,7 +34,6 @@ EXPECTED_DATASET_VERSION = "official_v001"
 EXPECTED_TRAIN_ROWS = 14_736
 EXPECTED_VAL_ROWS = 1_637
 EXPECTED_TRAINABLE_PARAMETERS = 29_933_568
-EXPECTED_TOTAL_PARAMETERS_WITH_ADAPTER = 3_427_037_184
 _INTEGER_PATTERN = re.compile(r"^[+-]?\d+$")
 _SHA256_PATTERN = re.compile(r"^[0-9a-f]{64}$")
 _ALLOWED_TARGET_MODULES = {
@@ -957,6 +956,94 @@ def validate_lora_target_modules(model: Any, targets: Sequence[str]) -> dict[str
     return counts
 
 
+def derive_lora_parameter_breakdown(
+    model: Any, targets: Sequence[str], rank: int
+) -> dict[str, Any]:
+    """Derive LoRA A/B sizes from exact target-module dimensions."""
+
+    if isinstance(rank, bool) or not isinstance(rank, int) or rank < 1:
+        raise SFTError("LoRA rank must be a positive integer.")
+    target_counts = validate_lora_target_modules(model, targets)
+    dimensions: dict[str, dict[tuple[int, int], int]] = {target: {} for target in targets}
+    for name, module in model.named_modules():
+        terminal_name = name.rsplit(".", maxsplit=1)[-1]
+        if terminal_name not in dimensions:
+            continue
+        in_features = getattr(module, "in_features", None)
+        out_features = getattr(module, "out_features", None)
+        if (
+            isinstance(in_features, bool)
+            or not isinstance(in_features, int)
+            or in_features < 1
+            or isinstance(out_features, bool)
+            or not isinstance(out_features, int)
+            or out_features < 1
+        ):
+            raise SFTError(
+                f"LoRA target module lacks positive integer dimensions: {name} "
+                f"(in_features={in_features}, out_features={out_features})."
+            )
+        shape = (in_features, out_features)
+        dimensions[terminal_name][shape] = dimensions[terminal_name].get(shape, 0) + 1
+
+    by_target: dict[str, Any] = {}
+    expected_trainable = 0
+    for target in targets:
+        dimension_counts = []
+        target_a = 0
+        target_b = 0
+        for (in_features, out_features), module_count in sorted(dimensions[target].items()):
+            lora_a = rank * in_features * module_count
+            lora_b = rank * out_features * module_count
+            target_a += lora_a
+            target_b += lora_b
+            dimension_counts.append(
+                {
+                    "in_features": in_features,
+                    "out_features": out_features,
+                    "module_count": module_count,
+                    "lora_a_parameters": lora_a,
+                    "lora_b_parameters": lora_b,
+                    "total_lora_parameters": lora_a + lora_b,
+                }
+            )
+        if sum(item["module_count"] for item in dimension_counts) != target_counts[target]:
+            raise SFTError(f"LoRA dimension count mismatch for target {target}.")
+        target_total = target_a + target_b
+        expected_trainable += target_total
+        by_target[target] = {
+            "module_count": target_counts[target],
+            "dimensions": dimension_counts,
+            "lora_a_parameters": target_a,
+            "lora_b_parameters": target_b,
+            "total_lora_parameters": target_total,
+        }
+    return {
+        "rank": rank,
+        "target_module_counts": target_counts,
+        "by_target": by_target,
+        "expected_trainable_parameters": expected_trainable,
+    }
+
+
+def _logical_parameter_count(parameter: Any) -> int:
+    """Return logical elements, undoing BitsAndBytes' packed 4-bit storage count."""
+
+    count = int(parameter.numel())
+    if count == 0 and hasattr(parameter, "ds_numel"):
+        count = int(parameter.ds_numel)
+    if parameter.__class__.__name__ == "Params4bit":
+        num_bytes = int(parameter.element_size()) if hasattr(parameter, "element_size") else 1
+        count *= 2 * num_bytes
+    return count
+
+
+def logical_model_parameter_count(model: Any) -> int:
+    """Count logical model parameters consistently with PEFT's 4-bit reporting."""
+
+    return sum(_logical_parameter_count(parameter) for parameter in model.parameters())
+
+
 def inspect_base_model_architecture(settings: SFTSettings) -> dict[str, Any]:
     """Inspect Qwen module names on the meta device without loading model weights."""
 
@@ -973,7 +1060,10 @@ def inspect_base_model_architecture(settings: SFTSettings) -> dict[str, Any]:
     )
     with init_empty_weights():
         model = AutoModelForCausalLM.from_config(config)
-    counts = validate_lora_target_modules(model, settings.lora.target_modules)
+    model.tie_weights()
+    breakdown = derive_lora_parameter_breakdown(
+        model, settings.lora.target_modules, settings.lora.r
+    )
     return {
         "model_type": config.model_type,
         "architectures": list(config.architectures or []),
@@ -981,43 +1071,87 @@ def inspect_base_model_architecture(settings: SFTSettings) -> dict[str, Any]:
         "hidden_size": int(config.hidden_size),
         "intermediate_size": int(config.intermediate_size),
         "max_position_embeddings": int(config.max_position_embeddings),
-        "base_parameters": sum(int(parameter.numel()) for parameter in model.parameters()),
-        "target_module_counts": counts,
+        "base_parameters": logical_model_parameter_count(model),
+        "target_module_counts": breakdown["target_module_counts"],
+        "lora_parameter_breakdown": breakdown,
         "model_commit": snapshot.commit_hash,
     }
 
 
-def trainable_parameter_report(model: Any) -> dict[str, Any]:
+def trainable_parameter_report(
+    model: Any,
+    *,
+    expected_trainable_parameters: int | None = None,
+    expected_total_parameters: int | None = None,
+    target_breakdown: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
     """Fail if a QLoRA run accidentally unfreezes non-LoRA base parameters."""
 
     total = 0
     trainable = 0
     unexpected: list[str] = []
+    target_names = tuple((target_breakdown or {}).get("by_target", {}))
+    trainable_by_target = {target: 0 for target in target_names}
+    unattributed_lora: list[str] = []
     trainable_names: list[str] = []
     for name, parameter in model.named_parameters():
-        count = int(parameter.numel())
-        if count == 0 and hasattr(parameter, "ds_numel"):
-            count = int(parameter.ds_numel)
-        if parameter.__class__.__name__ == "Params4bit":
-            num_bytes = int(parameter.element_size()) if hasattr(parameter, "element_size") else 1
-            count *= 2 * num_bytes
+        count = _logical_parameter_count(parameter)
         total += count
         if parameter.requires_grad:
             trainable += count
             trainable_names.append(name)
             if "lora_" not in name:
                 unexpected.append(name)
-    if total == 0 or trainable == 0:
-        raise SFTError("QLoRA model must have nonzero total and trainable parameters.")
-    if unexpected:
-        raise SFTError(f"Unexpected trainable base-model parameters: {unexpected[:10]}")
-    return {
+            elif target_names:
+                name_parts = set(name.split("."))
+                matched_targets = [target for target in target_names if target in name_parts]
+                if len(matched_targets) == 1:
+                    trainable_by_target[matched_targets[0]] += count
+                else:
+                    unattributed_lora.append(name)
+    report = {
         "total_parameters": total,
         "trainable_parameters": trainable,
-        "trainable_percentage": round(100.0 * trainable / total, 8),
+        "frozen_parameters": total - trainable,
+        "trainable_percentage": None if total == 0 else round(100.0 * trainable / total, 8),
         "trainable_tensor_count": len(trainable_names),
-        "unexpected_trainable_parameters": [],
+        "actual_trainable_parameters_by_target": trainable_by_target,
+        "unexpected_trainable_parameters": unexpected[:10],
+        "unexpected_trainable_parameter_count": len(unexpected),
+        "unattributed_trainable_lora_parameters": unattributed_lora[:10],
     }
+    if expected_trainable_parameters is not None:
+        report["expected_trainable_parameters"] = expected_trainable_parameters
+    if expected_total_parameters is not None:
+        report["expected_total_parameters"] = expected_total_parameters
+    if target_breakdown is not None:
+        report["target_module_breakdown"] = dict(target_breakdown)
+
+    failures = []
+    if total == 0 or trainable == 0:
+        failures.append("QLoRA model must have nonzero total and trainable parameters")
+    if unexpected:
+        failures.append("Unexpected trainable base-model parameters")
+    if unattributed_lora:
+        failures.append("Trainable LoRA parameters could not be attributed to a configured target")
+    if expected_trainable_parameters is not None and trainable != expected_trainable_parameters:
+        failures.append("Actual trainable parameter count differs from analytical expectation")
+    if expected_total_parameters is not None and total != expected_total_parameters:
+        failures.append("Actual total parameter count differs from analytical expectation")
+    if target_breakdown is not None:
+        expected_by_target = {
+            target: int(details["total_lora_parameters"])
+            for target, details in target_breakdown["by_target"].items()
+        }
+        if trainable_by_target != expected_by_target:
+            failures.append("Actual LoRA parameter counts differ by target")
+    if failures:
+        diagnostic = {"failures": failures, **report}
+        raise SFTError(
+            "QLoRA parameter validation failed: "
+            + json.dumps(diagnostic, sort_keys=True, ensure_ascii=True)
+        )
+    return report
 
 
 def build_training_identity(
@@ -1275,7 +1409,18 @@ def _prepare_model(settings: SFTSettings) -> tuple[Any, dict[str, int], dict[str
     except (OSError, RuntimeError) as exc:  # pragma: no cover - CUDA boundary
         raise SFTError("Could not load the exact Qwen base with the frozen QLoRA config.") from exc
     model.config.use_cache = False
-    target_counts = validate_lora_target_modules(model, settings.lora.target_modules)
+    lora_breakdown = derive_lora_parameter_breakdown(
+        model, settings.lora.target_modules, settings.lora.r
+    )
+    target_counts = lora_breakdown["target_module_counts"]
+    expected_trainable_parameters = lora_breakdown["expected_trainable_parameters"]
+    if expected_trainable_parameters != EXPECTED_TRAINABLE_PARAMETERS:
+        raise SFTError(
+            "Analytical LoRA count differs from the frozen E001 invariant: "
+            + json.dumps(lora_breakdown, sort_keys=True, ensure_ascii=True)
+        )
+    base_parameters = logical_model_parameter_count(model)
+    expected_total_parameters = base_parameters + expected_trainable_parameters
     model = prepare_model_for_kbit_training(
         model,
         use_gradient_checkpointing=settings.training.gradient_checkpointing,
@@ -1292,15 +1437,16 @@ def _prepare_model(settings: SFTSettings) -> tuple[Any, dict[str, int], dict[str
             task_type=settings.lora.task_type,
         ),
     )
-    report = trainable_parameter_report(model)
-    if (
-        report["trainable_parameters"] != EXPECTED_TRAINABLE_PARAMETERS
-        or report["total_parameters"] != EXPECTED_TOTAL_PARAMETERS_WITH_ADAPTER
-    ):
-        raise SFTError("QLoRA parameter counts do not match the frozen Qwen2-3B r=16 architecture.")
+    report = trainable_parameter_report(
+        model,
+        expected_trainable_parameters=expected_trainable_parameters,
+        expected_total_parameters=expected_total_parameters,
+        target_breakdown=lora_breakdown,
+    )
     report.update(
         {
             "base_model_commit": snapshot.commit_hash,
+            "base_parameters": base_parameters,
             "target_module_counts": target_counts,
         }
     )

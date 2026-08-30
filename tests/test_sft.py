@@ -17,8 +17,10 @@ from qwen_math_challenge.training.sft import (
     build_training_identity,
     build_training_messages,
     canonical_integer_target,
+    derive_lora_parameter_breakdown,
     encode_sft_example,
     load_sft_settings,
+    logical_model_parameter_count,
     trainable_parameter_report,
     validate_adapter_compatibility,
     validate_lora_target_modules,
@@ -226,22 +228,27 @@ def test_train_validation_group_overlap_is_rejected(monkeypatch, tmp_path: Path)
 class Linear4bit(torch.nn.Module):
     """GPU-free stand-in for the BitsAndBytes class used after 4-bit loading."""
 
-    def __init__(self) -> None:
+    def __init__(self, in_features: int, out_features: int) -> None:
         super().__init__()
+        self.in_features = in_features
+        self.out_features = out_features
 
 
 class FakeQwenAttention(torch.nn.Module):
     def __init__(self) -> None:
         super().__init__()
-        for name in ("q_proj", "k_proj", "v_proj", "o_proj"):
-            setattr(self, name, Linear4bit())
+        self.q_proj = Linear4bit(2048, 2048)
+        self.k_proj = Linear4bit(2048, 256)
+        self.v_proj = Linear4bit(2048, 256)
+        self.o_proj = Linear4bit(2048, 2048)
 
 
 class FakeQwenMLP(torch.nn.Module):
     def __init__(self) -> None:
         super().__init__()
-        for name in ("gate_proj", "up_proj", "down_proj"):
-            setattr(self, name, Linear4bit())
+        self.gate_proj = Linear4bit(2048, 11008)
+        self.up_proj = Linear4bit(2048, 11008)
+        self.down_proj = Linear4bit(11008, 2048)
 
 
 class FakeQwenLayer(torch.nn.Module):
@@ -279,14 +286,46 @@ def test_lora_target_module_missing_is_rejected() -> None:
 
 def test_lora_target_module_partial_names_do_not_match() -> None:
     model = FakeQwen(layers=1)
-    model.q_proj_extra = Linear4bit()
-    model.foo_q_proj = Linear4bit()
+    model.q_proj_extra = Linear4bit(1, 1)
+    model.foo_q_proj = Linear4bit(1, 1)
     model.wrapper = torch.nn.Module()
-    model.wrapper.down_proj_extra = Linear4bit()
+    model.wrapper.down_proj_extra = Linear4bit(1, 1)
 
     counts = validate_lora_target_modules(model, sorted(sft._ALLOWED_TARGET_MODULES))
 
     assert counts == {target: 1 for target in sorted(sft._ALLOWED_TARGET_MODULES)}
+
+
+def test_exact_qwen25_lora_parameter_count_is_derived_analytically() -> None:
+    breakdown = derive_lora_parameter_breakdown(
+        FakeQwen(layers=36), sorted(sft._ALLOWED_TARGET_MODULES), rank=16
+    )
+
+    assert breakdown["target_module_counts"] == {
+        target: 36 for target in sorted(sft._ALLOWED_TARGET_MODULES)
+    }
+    assert breakdown["expected_trainable_parameters"] == 29_933_568
+    assert {
+        target: details["total_lora_parameters"]
+        for target, details in breakdown["by_target"].items()
+    } == {
+        "down_proj": 7_520_256,
+        "gate_proj": 7_520_256,
+        "k_proj": 1_327_104,
+        "o_proj": 2_359_296,
+        "q_proj": 2_359_296,
+        "up_proj": 7_520_256,
+        "v_proj": 1_327_104,
+    }
+
+
+def test_logical_parameter_count_does_not_double_count_tied_weights() -> None:
+    model = torch.nn.Module()
+    model.embed_tokens = torch.nn.Embedding(3, 2)
+    model.lm_head = torch.nn.Linear(2, 3, bias=False)
+    model.lm_head.weight = model.embed_tokens.weight
+
+    assert logical_model_parameter_count(model) == 6
 
 
 class TinyAdapter(torch.nn.Module):
@@ -302,6 +341,58 @@ def test_only_lora_parameters_may_be_trainable() -> None:
     assert report["unexpected_trainable_parameters"] == []
     with pytest.raises(SFTError, match="Unexpected trainable"):
         trainable_parameter_report(TinyAdapter(unfreeze_base=True))
+
+
+class TinyTargetedAdapter(torch.nn.Module):
+    def __init__(self, *, include_lora_b: bool = True, extra_trainable: bool = False) -> None:
+        super().__init__()
+        self.base = torch.nn.Parameter(torch.zeros(3), requires_grad=False)
+        self.q_proj = torch.nn.Module()
+        self.q_proj.lora_A = torch.nn.Parameter(torch.zeros(2), requires_grad=True)
+        if include_lora_b:
+            self.q_proj.lora_B = torch.nn.Parameter(torch.zeros(3), requires_grad=True)
+        if extra_trainable:
+            self.extra = torch.nn.Parameter(torch.zeros(1), requires_grad=True)
+
+
+_TINY_TARGET_BREAKDOWN = {
+    "by_target": {"q_proj": {"total_lora_parameters": 5}},
+}
+
+
+def test_parameter_count_mismatch_reports_expected_and_actual() -> None:
+    with pytest.raises(SFTError, match="analytical expectation") as error:
+        trainable_parameter_report(
+            TinyTargetedAdapter(),
+            expected_trainable_parameters=6,
+            expected_total_parameters=9,
+            target_breakdown=_TINY_TARGET_BREAKDOWN,
+        )
+
+    assert '"trainable_parameters": 5' in str(error.value)
+    assert '"expected_trainable_parameters": 6' in str(error.value)
+
+
+def test_accidental_extra_trainable_parameter_is_rejected() -> None:
+    with pytest.raises(SFTError, match="Unexpected trainable base-model parameters"):
+        trainable_parameter_report(
+            TinyTargetedAdapter(extra_trainable=True),
+            expected_trainable_parameters=5,
+            expected_total_parameters=8,
+            target_breakdown=_TINY_TARGET_BREAKDOWN,
+        )
+
+
+def test_missing_lora_parameter_is_rejected_with_target_diagnostic() -> None:
+    with pytest.raises(SFTError, match="differ by target") as error:
+        trainable_parameter_report(
+            TinyTargetedAdapter(include_lora_b=False),
+            expected_trainable_parameters=5,
+            expected_total_parameters=8,
+            target_breakdown=_TINY_TARGET_BREAKDOWN,
+        )
+
+    assert '"actual_trainable_parameters_by_target": {"q_proj": 2}' in str(error.value)
 
 
 def test_canonical_config_validation_and_schedule() -> None:

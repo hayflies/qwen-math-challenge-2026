@@ -49,6 +49,8 @@ htmlcov/
 /outputs/**
 !/outputs/.gitkeep
 /E000_*_canonical_artifacts.tar.gz
+/E001_*_canonical_artifacts.tar.gz
+/E001_*_canonical_artifacts.manifest.json
 /wandb/
 /runs/
 *.safetensors

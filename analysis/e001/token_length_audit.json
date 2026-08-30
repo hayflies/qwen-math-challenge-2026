@@ -1,0 +1,53 @@
+{
+  "assistant_eos_supervised": true,
+  "audit_version": "e001_token_length_v001",
+  "counts_above_threshold": {
+    "1024": 1,
+    "1152": 0,
+    "512": 13,
+    "768": 4
+  },
+  "dataset_version": "official_v001",
+  "decision": "max_seq_length=1152 preserves every official training example; dynamic padding avoids padding shorter examples to the maximum.",
+  "experiment_id": "E001",
+  "loss_mask_version": "assistant_only_v001",
+  "max_seq_length": 1152,
+  "model_name": "Qwen/Qwen2.5-3B-Instruct",
+  "model_revision": "aa8e72537993ba99e69dfaafa59ed015b17504d1",
+  "post_eos_template_tokens_excluded": true,
+  "prompt_token_length": {
+    "max": 1128,
+    "min": 51,
+    "p50": 99.0,
+    "p90": 149.0,
+    "p95": 176.0,
+    "p99": 262.0
+  },
+  "prompt_version": "zero_shot_v001",
+  "rows": 14736,
+  "schema_version": 1,
+  "split_version": "official_v001_split_v001",
+  "supervised_token_length": {
+    "max": 17,
+    "min": 2,
+    "p50": 3.0,
+    "p90": 5.0,
+    "p95": 5.0,
+    "p99": 7.0
+  },
+  "target_format_version": "direct_integer_v001",
+  "tokenizer_commit": "aa8e72537993ba99e69dfaafa59ed015b17504d1",
+  "tokenizer_revision": "aa8e72537993ba99e69dfaafa59ed015b17504d1",
+  "total_token_length": {
+    "max": 1131,
+    "min": 54,
+    "p50": 103.0,
+    "p90": 153.0,
+    "p95": 180.0,
+    "p99": 265.0
+  },
+  "train_sha256": "797fe3396876d5a1c70f3269263661c4fc739e61b8e971e77e042f0dcb4fbfdd",
+  "truncated_percentage": 0.0,
+  "truncated_rows": 0,
+  "truncation_policy": "error"
+}

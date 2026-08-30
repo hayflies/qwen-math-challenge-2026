@@ -1,0 +1,152 @@
+schema_version: 1
+experiment:
+  experiment_id: E001
+  phase: 4
+  name: official_direct_answer_sft
+  purpose: >-
+    Determine whether the simplest reproducible official-only direct-answer SFT improves
+    validation integer Exact Match over canonical E000.
+  phase3_5_start_commit: aaf4509bb0a3b1bddb31a982bbf1d535587ce1cc
+  implementation_commit: null
+  status: implementation_ready_gpu_execution_pending
+
+identity:
+  base_model: Qwen/Qwen2.5-3B-Instruct
+  base_revision: aa8e72537993ba99e69dfaafa59ed015b17504d1
+  tokenizer_revision: aa8e72537993ba99e69dfaafa59ed015b17504d1
+  dataset_version: official_v001
+  split_version: official_v001_split_v001
+  train_path: data/splits/official_v001/train.csv
+  train_rows: 14736
+  train_sha256: 797fe3396876d5a1c70f3269263661c4fc739e61b8e971e77e042f0dcb4fbfdd
+  validation_path: data/splits/official_v001/val.csv
+  validation_rows: 1637
+  validation_sha256: cbf48fc75ed858795fa99cf15bd9de736465ba590d5752784af7de6b13c5a40c
+  groups_sha256: 7f0f0376d8e2f12a67ff959bfa183518fd4ba2214e18076e2e7363073e7ff566
+  train_validation_id_overlap: 0
+  train_validation_group_overlap: 0
+  external_datasets: []
+  reasoning_augmentation: false
+  category_weighting: false
+
+format:
+  prompt_version: zero_shot_v001
+  target_format_version: direct_integer_v001
+  target_semantic_content: integer_answer_only
+  loss_mask_version: assistant_only_v001
+  eos_supervised: true
+  parser_version: integer_v001
+  generation_version: greedy_v001
+  max_new_tokens: 1024
+
+token_length_audit:
+  version: e001_token_length_v001
+  path: analysis/e001/token_length_audit.json
+  sha256: d836348c6da26987ed361647f75bd25e2ea01e53bc6ee843c1878779ec945e8e
+  min: 54
+  p50: 103.0
+  p90: 153.0
+  p95: 180.0
+  p99: 265.0
+  max: 1131
+  max_seq_length: 1152
+  truncated_rows: 0
+
+training:
+  method: qlora
+  device_target: NVIDIA_Tesla_T4_16GB
+  compute_dtype: float16
+  quantization:
+    load_in_4bit: true
+    bnb_4bit_quant_type: nf4
+    bnb_4bit_compute_dtype: float16
+    bnb_4bit_use_double_quant: true
+  lora:
+    r: 16
+    lora_alpha: 32
+    lora_dropout: 0.05
+    target_modules: [q_proj, k_proj, v_proj, o_proj, gate_proj, up_proj, down_proj]
+    bias: none
+    task_type: CAUSAL_LM
+    expected_trainable_parameters: 29933568
+    expected_total_parameters_with_adapter: 3427037184
+    expected_trainable_percentage: 0.8734532599
+  optimizer: paged_adamw_8bit
+  learning_rate: 0.0002
+  weight_decay: 0.0
+  lr_scheduler_type: cosine
+  warmup_ratio: 0.03
+  warmup_steps: 28
+  max_grad_norm: 0.3
+  epochs: 1
+  micro_batch_size: 1
+  gradient_accumulation_steps: 16
+  effective_batch_size: 16
+  steps_per_epoch: 921
+  total_optimizer_steps: 921
+  gradient_checkpointing: true
+  save_steps: 250
+  save_total_limit: 1
+  seed: 2026
+
+dependencies:
+  python: ">=3.11,<3.12"
+  locked:
+    torch: 2.13.0
+    transformers: 4.57.6
+    accelerate: 1.14.0
+    peft: 0.20.0
+    bitsandbytes: 0.50.2
+
+canonical_e000:
+  total: 1637
+  correct: 1075
+  incorrect: 562
+  accuracy: 0.6566890653634697
+  parse_failures: 6
+  max_token_hits: 78
+
+execution_status:
+  phase4_e001_implementation: PASS
+  local_preflight: PASS
+  local_cuda_available: false
+  cuda_smoke: PENDING
+  checkpoint_reload_smoke: PENDING
+  full_training: PENDING
+  full_validation_inference: PENDING
+  paired_comparison: PENDING
+  canonical_archive: PENDING
+
+gate:
+  phase3_5_committed: PASS
+  exact_official_split_verified: PASS
+  validation_leakage_invariants: PASS
+  designated_base_and_revision: PASS
+  direct_answer_only: PASS
+  prompt_fixed_to_e000: PASS
+  qlora_config_recorded: PASS
+  assistant_only_loss_masking_unit_test: PASS
+  tokenizer_length_audit: PASS
+  local_ruff_and_pytest: PASS
+  cuda_training_smoke: PENDING
+  full_training_completed: PENDING
+  final_adapter_preserved: PENDING
+  full_1637_validation_inference: PENDING
+  paired_e000_e001_comparison: PENDING
+  diagnostics_recorded: PENDING
+  artifacts_hashed_and_frozen: PENDING
+  engineering_gate: PENDING_GPU_EXECUTION
+
+local_verification:
+  uv_lock_check: PASS
+  ruff_check: PASS
+  ruff_format_check: PASS
+  pytest: 103_passed
+  git_diff_check: PASS
+  tokenizer_audit_repeated_hash_match: PASS
+  raw_data_hashes_match_official_v001_manifest: PASS
+
+future_e002_hypotheses_only:
+  - Direct-answer SFT may shorten outputs without improving mathematical correctness.
+  - If E001 improves format but regresses hard reasoning, E002 must change only one variable.
+  - Max-token policy and parser remain separate versioned experiments, not retroactive E001 edits.

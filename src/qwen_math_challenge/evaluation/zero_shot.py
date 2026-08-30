@@ -265,12 +265,21 @@ def _require_filename(value: object, label: str, suffix: str) -> str:
     return filename
 
 
-def load_zero_shot_settings(config: LoadedConfig, project_root: str | Path) -> ZeroShotSettings:
-    """Validate the single-model deterministic E000 configuration."""
+def load_zero_shot_settings(
+    config: LoadedConfig,
+    project_root: str | Path,
+    *,
+    expected_experiment_id: str = "E000",
+    expected_phase: int = 3,
+) -> ZeroShotSettings:
+    """Validate the single-model deterministic E000-compatible evaluation configuration."""
 
     root = Path(project_root).resolve()
-    if config.phase != 3 or config.experiment_id != "E000":
-        raise EvaluationError("E000 config must set experiment_id E000 and phase 3.")
+    if config.phase != expected_phase or config.experiment_id != expected_experiment_id:
+        raise EvaluationError(
+            f"Evaluation config must set experiment_id {expected_experiment_id} "
+            f"and phase {expected_phase}."
+        )
 
     model = _require_mapping(config.raw.get("model"), "model")
     name_or_path = _require_string(model.get("name_or_path"), "model.name_or_path")
@@ -680,6 +689,7 @@ class TransformersBatchGenerator:
         settings: ZeroShotSettings,
         snapshot: ModelSnapshot,
         device_spec: DeviceSpec,
+        adapter_path: str | Path | None = None,
     ) -> None:
         try:
             import torch
@@ -725,6 +735,41 @@ class TransformersBatchGenerator:
             raise ModelUnavailableError(
                 "The cached Qwen model snapshot is incomplete or unreadable."
             ) from exc
+        self.adapter_identity: dict[str, Any] | None = None
+        if adapter_path is not None:
+            resolved_adapter = Path(adapter_path).expanduser().resolve()
+            adapter_config_path = resolved_adapter / "adapter_config.json"
+            if not adapter_config_path.is_file():
+                raise EvaluationError(f"Adapter config does not exist: {adapter_config_path}")
+            try:
+                adapter_config = json.loads(adapter_config_path.read_text(encoding="utf-8"))
+            except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+                raise EvaluationError("Adapter config must be valid UTF-8 JSON.") from exc
+            valid_base_names = {settings.model.name_or_path, str(snapshot.path)}
+            if adapter_config.get("base_model_name_or_path") not in valid_base_names:
+                raise EvaluationError(
+                    "Adapter base_model_name_or_path does not match the designated Qwen base."
+                )
+            try:
+                from peft import PeftModel
+            except ImportError as exc:  # pragma: no cover - environment boundary
+                raise ModelUnavailableError(
+                    "PEFT must be installed from the locked E001 environment."
+                ) from exc
+            try:
+                self._model = PeftModel.from_pretrained(
+                    self._model,
+                    resolved_adapter,
+                    is_trainable=False,
+                    local_files_only=True,
+                )
+            except (OSError, RuntimeError, ValueError) as exc:
+                raise EvaluationError("Could not load the frozen E001 adapter.") from exc
+            self.adapter_identity = {
+                "adapter_path": str(resolved_adapter),
+                "base_model_name_or_path": adapter_config.get("base_model_name_or_path"),
+                "adapter_loaded": True,
+            }
         try:
             self._model.to(device_spec.device)
         except RuntimeError as exc:
@@ -750,6 +795,8 @@ class TransformersBatchGenerator:
             "dtype": self.device_spec.dtype,
             "model_load_time_sec": round(self.model_load_time_sec, 8),
         }
+        if self.adapter_identity is not None:
+            metadata["adapter"] = self.adapter_identity
         if self.device_spec.device != "cuda":
             return metadata
 
@@ -926,12 +973,13 @@ def build_resume_identity(
     generator: BatchGenerator,
     *,
     limit: int | None,
+    pipeline_version: str = PIPELINE_VERSION,
 ) -> dict[str, Any]:
     """Build the exact compatibility identity required before reusing predictions."""
 
     identity = {
         "schema_version": 1,
-        "pipeline_version": PIPELINE_VERSION,
+        "pipeline_version": pipeline_version,
         "model_name": settings.model.name_or_path,
         "model_revision": settings.model.revision,
         "model_commit": generator.model_commit,
@@ -947,6 +995,9 @@ def build_resume_identity(
         "limit": limit,
         "config_sha256": config.source_sha256,
     }
+    adapter_identity = getattr(generator, "adapter_identity", None)
+    if adapter_identity is not None:
+        identity["adapter_identity"] = adapter_identity
     canonical = json.dumps(identity, sort_keys=True, ensure_ascii=False).encode("utf-8")
     return {"identity": identity, "identity_sha256": hashlib.sha256(canonical).hexdigest()}
 
@@ -991,13 +1042,14 @@ def _summary(values: Sequence[float | int]) -> dict[str, float | int | None]:
     if not values:
         return {"mean": None, "median": None, "p95": None, "p99": None, "max": None}
     array = np.asarray(values, dtype=np.float64)
-    return {
+    fields = {
         "mean": round(float(array.mean()), 8),
         "median": round(float(np.median(array)), 8),
         "p95": round(float(np.percentile(array, 95)), 8),
         "p99": round(float(np.percentile(array, 99)), 8),
         "max": round(float(array.max()), 8),
     }
+    return fields
 
 
 def aggregate_metrics(
@@ -1076,10 +1128,13 @@ def run_zero_shot_evaluation(
     generator: BatchGenerator,
     limit: int | None = None,
     resume_from: str | Path | None = None,
+    settings: ZeroShotSettings | None = None,
+    pipeline_version: str = PIPELINE_VERSION,
+    experiment_id: str = "E000",
 ) -> EvaluationResult:
     """Evaluate the frozen validation prefix with incremental, compatible resume output."""
 
-    settings = load_zero_shot_settings(config, project_root)
+    settings = settings or load_zero_shot_settings(config, project_root)
     rows = load_validation_rows(settings.data)
     if limit is not None:
         if isinstance(limit, bool) or not isinstance(limit, int) or limit < 1:
@@ -1092,7 +1147,13 @@ def run_zero_shot_evaluation(
 
     output_dir = Path(run_dir).resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
-    identity = build_resume_identity(config, settings, generator, limit=limit)
+    identity = build_resume_identity(
+        config,
+        settings,
+        generator,
+        limit=limit,
+        pipeline_version=pipeline_version,
+    )
     identity_path = output_dir / settings.output.resume_identity_filename
     _atomic_write_json(identity_path, identity)
 
@@ -1146,8 +1207,8 @@ def run_zero_shot_evaluation(
     metrics.update(
         {
             "schema_version": 1,
-            "pipeline_version": PIPELINE_VERSION,
-            "experiment_id": "E000",
+            "pipeline_version": pipeline_version,
+            "experiment_id": experiment_id,
             "split_version": settings.data.split_version,
             "validation_sha256": settings.data.validation_sha256,
             "limit": limit,
@@ -1180,6 +1241,8 @@ def build_run_manifest_fields(
     *,
     limit: int | None,
     resumed_from: str | None,
+    pipeline_version: str = PIPELINE_VERSION,
+    no_training: bool = True,
 ) -> dict[str, Any]:
     """Build the E000-specific run-manifest fields required for provenance."""
 
@@ -1191,8 +1254,8 @@ def build_run_manifest_fields(
         transformers_version = importlib.metadata.version("transformers")
     except importlib.metadata.PackageNotFoundError:
         transformers_version = None
-    return {
-        "pipeline_version": PIPELINE_VERSION,
+    fields = {
+        "pipeline_version": pipeline_version,
         "model_name": settings.model.name_or_path,
         "model_revision": settings.model.revision,
         "model_commit": generator.model_commit,
@@ -1221,7 +1284,11 @@ def build_run_manifest_fields(
         "parse_failures": result.metrics["parse_failures"],
         "accuracy": result.metrics["accuracy"],
         "artifact_sha256": result.artifact_sha256,
-        "no_training": True,
+        "no_training": no_training,
         "external_datasets": [],
         "tool_use": False,
     }
+    adapter_identity = getattr(generator, "adapter_identity", None)
+    if adapter_identity is not None:
+        fields["adapter_identity"] = adapter_identity
+    return fields

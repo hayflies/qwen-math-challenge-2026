@@ -6,7 +6,8 @@
 
 현재 구현 범위는 **Phase 0 — 프로젝트 기반 및 재현성**, **Phase 1 — 공식 데이터 감사 및
 정제**, **Phase 2 — leakage-safe 내부 validation 구축**, **Phase 3 — E000 zero-shot
-평가**다. 학습과 제출 생성 로직은 아직 구현하지 않는다.
+평가**, **Phase 4 — E001 official-only direct-answer SFT 실행 준비**다. E001의 실제 CUDA
+smoke, full training과 full validation 평가는 아직 pending이다.
 
 ## 환경 준비
 
@@ -17,8 +18,8 @@ Python 3.11과 `uv`를 사용한다. 직접 의존성의 허용 범위는 `pypro
 uv sync --frozen --group dev
 ```
 
-Phase 3은 추론에 필요한 PyTorch, Transformers, Accelerate만 추가한다. PEFT, TRL,
-bitsandbytes, datasets, DeepSpeed는 아직 설치하지 않는다.
+Phase 4 E001은 QLoRA에 실제 필요한 PEFT와 bitsandbytes를 추가한다. TRL, datasets,
+DeepSpeed는 사용하지 않는다.
 
 ## 검증
 
@@ -127,3 +128,22 @@ uv run --frozen --no-sync python scripts/analyze_e000.py \
   --archive E000_20260828_canonical_artifacts.tar.gz \
   --output-dir analysis/e000
 ```
+
+## Phase 4 E001 direct-answer QLoRA
+
+E001은 오직 `official_v001_split_v001`의 14,736개 train row를 사용하고, assistant target을
+canonical integer와 EOS로만 구성한다. E000의 `zero_shot_v001` prompt와
+`greedy_v001`/`integer_v001` 평가 설정을 그대로 유지한다. 전체 tokenizer audit 결과 최대
+길이는 1,131 token이므로 `max_seq_length=1152`에서 truncation은 0건이다.
+
+로컬 preflight는 모델 weight나 CUDA 없이 실행할 수 있다.
+
+```bash
+uv run --frozen --no-sync python scripts/train_sft.py \
+  --config configs/sft/e001_official_direct_answer.yaml \
+  --validate-only
+```
+
+Tesla T4 smoke, full training, adapter 평가와 artifact 동결의 정확한 순서는
+[`docs/kaggle_e001.md`](docs/kaggle_e001.md)를 따른다. 다른 hyperparameter, external data,
+reasoning augmentation, parser/prompt/generation 변경은 E001에 섞지 않는다.

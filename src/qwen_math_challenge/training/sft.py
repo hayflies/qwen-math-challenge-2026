@@ -1315,6 +1315,44 @@ def _package_version(name: str) -> str | None:
         return None
 
 
+def _normalize_telemetry_value(value: Any, *, path: str = "") -> tuple[Any, list[dict[str, str]]]:
+    """Replace non-finite telemetry floats with null and record their stable paths."""
+
+    if isinstance(value, (float, np.floating)):
+        numeric = float(value)
+        if math.isfinite(numeric):
+            return numeric if isinstance(value, np.floating) else value, []
+        label = "NaN" if math.isnan(numeric) else "+Infinity" if numeric > 0 else "-Infinity"
+        return None, [{"path": path or "$", "value": label}]
+    if isinstance(value, Mapping):
+        normalized = {}
+        issues = []
+        for key, nested in value.items():
+            nested_path = f"{path}.{key}" if path else str(key)
+            safe_value, nested_issues = _normalize_telemetry_value(nested, path=nested_path)
+            normalized[key] = safe_value
+            issues.extend(nested_issues)
+        return normalized, issues
+    if isinstance(value, (list, tuple)):
+        normalized = []
+        issues = []
+        for index, nested in enumerate(value):
+            nested_path = f"{path}[{index}]" if path else f"[{index}]"
+            safe_value, nested_issues = _normalize_telemetry_value(nested, path=nested_path)
+            normalized.append(safe_value)
+            issues.extend(nested_issues)
+        return normalized, issues
+    return value, []
+
+
+def _validate_finite_training_metrics(values: Mapping[str, Any]) -> None:
+    """Reject non-finite objectives while allowing recoverable AMP gradient overflows."""
+
+    for key in ("loss", "eval_loss", "train_loss"):
+        if key in values and not math.isfinite(float(values[key])):
+            raise FloatingPointError(f"Non-finite {key}: {values[key]}")
+
+
 class _TrainingTelemetryCallback:
     """Transformers callback implementation created lazily to keep imports lightweight."""
 
@@ -1333,9 +1371,7 @@ class _TrainingTelemetryCallback:
         class Callback(TrainerCallback):
             def on_log(self, args, state, control, logs=None, **kwargs):
                 values = dict(logs or {})
-                for key in ("loss", "eval_loss"):
-                    if key in values and not math.isfinite(float(values[key])):
-                        raise FloatingPointError(f"Non-finite {key}: {values[key]}")
+                _validate_finite_training_metrics(values)
                 record: dict[str, Any] = {
                     "step": int(state.global_step),
                     "epoch": None if state.epoch is None else float(state.epoch),
@@ -1350,8 +1386,11 @@ class _TrainingTelemetryCallback:
                             "gpu_reserved_bytes": int(outer.torch.cuda.memory_reserved(device)),
                         }
                     )
+                safe_record, non_finite_values = _normalize_telemetry_value(record)
+                if non_finite_values:
+                    safe_record["_non_finite_values"] = non_finite_values
                 with outer.path.open("a", encoding="utf-8") as handle:
-                    handle.write(json.dumps(record, sort_keys=True, allow_nan=False) + "\n")
+                    handle.write(json.dumps(safe_record, sort_keys=True, allow_nan=False) + "\n")
 
             def on_save(self, args, state, control, **kwargs):
                 checkpoint = Path(args.output_dir) / f"checkpoint-{state.global_step}"

@@ -1,6 +1,7 @@
 import csv
 import json
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 import torch
@@ -393,6 +394,106 @@ def test_missing_lora_parameter_is_rejected_with_target_diagnostic() -> None:
         )
 
     assert '"actual_trainable_parameters_by_target": {"q_proj": 2}' in str(error.value)
+
+
+class NoCudaTorch:
+    class cuda:
+        @staticmethod
+        def is_available() -> bool:
+            return False
+
+
+def _write_telemetry(tmp_path: Path, logs: dict) -> tuple[str, dict]:
+    path = tmp_path / "training_log.jsonl"
+    callback = sft._TrainingTelemetryCallback(path, {}, NoCudaTorch()).callback
+    callback.on_log(
+        None,
+        SimpleNamespace(global_step=2, epoch=0.5),
+        None,
+        logs=logs,
+    )
+    line = path.read_text(encoding="utf-8").strip()
+    return line, json.loads(line)
+
+
+def test_raw_non_finite_telemetry_reproduces_strict_json_failure() -> None:
+    with pytest.raises(ValueError, match="Out of range float values"):
+        json.dumps({"loss": 5.7528, "grad_norm": float("inf")}, allow_nan=False)
+
+
+def test_finite_telemetry_values_are_unchanged(tmp_path: Path) -> None:
+    line, record = _write_telemetry(
+        tmp_path,
+        {
+            "loss": 5.7528,
+            "grad_norm": 50.407806396484375,
+            "learning_rate": 0.0,
+            "nested": {"values": [1, 2.5]},
+        },
+    )
+
+    assert record["loss"] == 5.7528
+    assert record["grad_norm"] == 50.407806396484375
+    assert record["learning_rate"] == 0.0
+    assert record["nested"] == {"values": [1, 2.5]}
+    assert "_non_finite_values" not in record
+    json.dumps(json.loads(line), allow_nan=False)
+
+
+@pytest.mark.parametrize(
+    ("value", "label"),
+    [
+        (float("nan"), "NaN"),
+        (float("inf"), "+Infinity"),
+        (float("-inf"), "-Infinity"),
+    ],
+)
+def test_auxiliary_non_finite_values_become_strict_json_null(
+    tmp_path: Path, value: float, label: str
+) -> None:
+    line, record = _write_telemetry(tmp_path, {"loss": 1.0, "auxiliary": value})
+
+    assert record["auxiliary"] is None
+    assert record["_non_finite_values"] == [{"path": "auxiliary", "value": label}]
+    json.dumps(json.loads(line), allow_nan=False)
+
+
+def test_nested_non_finite_values_are_normalized_recursively(tmp_path: Path) -> None:
+    line, record = _write_telemetry(
+        tmp_path,
+        {
+            "loss": 1.0,
+            "nested": {
+                "values": [0.5, float("nan"), {"positive": float("inf")}],
+                "tuple": (float("-inf"), 7.0),
+            },
+        },
+    )
+
+    assert record["nested"] == {
+        "values": [0.5, None, {"positive": None}],
+        "tuple": [None, 7.0],
+    }
+    assert record["_non_finite_values"] == [
+        {"path": "nested.values[1]", "value": "NaN"},
+        {"path": "nested.values[2].positive", "value": "+Infinity"},
+        {"path": "nested.tuple[0]", "value": "-Infinity"},
+    ]
+    json.dumps(json.loads(line), allow_nan=False)
+
+
+@pytest.mark.parametrize("metric", ["loss", "eval_loss", "train_loss"])
+def test_non_finite_training_loss_still_fails(tmp_path: Path, metric: str) -> None:
+    with pytest.raises(FloatingPointError, match=f"Non-finite {metric}"):
+        _write_telemetry(tmp_path, {metric: float("nan")})
+
+
+def test_non_finite_grad_norm_is_explicit_but_nonfatal(tmp_path: Path) -> None:
+    line, record = _write_telemetry(tmp_path, {"loss": 1.0, "grad_norm": float("inf")})
+
+    assert record["grad_norm"] is None
+    assert record["_non_finite_values"] == [{"path": "grad_norm", "value": "+Infinity"}]
+    json.dumps(json.loads(line), allow_nan=False)
 
 
 def test_canonical_config_validation_and_schedule() -> None:

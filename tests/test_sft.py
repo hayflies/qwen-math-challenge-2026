@@ -223,25 +223,70 @@ def test_train_validation_group_overlap_is_rejected(monkeypatch, tmp_path: Path)
         validate_official_split(_split_settings(tmp_path, group_overlap=True))
 
 
-class FakeQwen(torch.nn.Module):
+class Linear4bit(torch.nn.Module):
+    """GPU-free stand-in for the BitsAndBytes class used after 4-bit loading."""
+
     def __init__(self) -> None:
         super().__init__()
-        for name in sorted(sft._ALLOWED_TARGET_MODULES):
-            setattr(self, name, torch.nn.Linear(2, 2, bias=False))
 
 
-def test_lora_target_modules_are_verified_against_model() -> None:
+class FakeQwenAttention(torch.nn.Module):
+    def __init__(self) -> None:
+        super().__init__()
+        for name in ("q_proj", "k_proj", "v_proj", "o_proj"):
+            setattr(self, name, Linear4bit())
+
+
+class FakeQwenMLP(torch.nn.Module):
+    def __init__(self) -> None:
+        super().__init__()
+        for name in ("gate_proj", "up_proj", "down_proj"):
+            setattr(self, name, Linear4bit())
+
+
+class FakeQwenLayer(torch.nn.Module):
+    def __init__(self) -> None:
+        super().__init__()
+        self.self_attn = FakeQwenAttention()
+        self.mlp = FakeQwenMLP()
+
+
+class FakeQwen(torch.nn.Module):
+    def __init__(self, *, layers: int = 2) -> None:
+        super().__init__()
+        self.model = torch.nn.Module()
+        self.model.layers = torch.nn.ModuleList(FakeQwenLayer() for _ in range(layers))
+
+
+def test_lora_target_modules_match_fully_qualified_qwen_names_and_counts() -> None:
     model = FakeQwen()
     counts = validate_lora_target_modules(model, sorted(sft._ALLOWED_TARGET_MODULES))
+
+    module_names = {name for name, _module in model.named_modules()}
+    assert "model.layers.0.self_attn.q_proj" in module_names
+    assert "model.layers.0.mlp.down_proj" in module_names
     assert set(counts) == sft._ALLOWED_TARGET_MODULES
-    assert set(counts.values()) == {1}
+    assert counts == {target: 2 for target in sorted(sft._ALLOWED_TARGET_MODULES)}
 
 
 def test_lora_target_module_missing_is_rejected() -> None:
     model = FakeQwen()
-    delattr(model, "q_proj")
+    for layer in model.model.layers:
+        delattr(layer.self_attn, "q_proj")
     with pytest.raises(SFTError, match="absent"):
         validate_lora_target_modules(model, sorted(sft._ALLOWED_TARGET_MODULES))
+
+
+def test_lora_target_module_partial_names_do_not_match() -> None:
+    model = FakeQwen(layers=1)
+    model.q_proj_extra = Linear4bit()
+    model.foo_q_proj = Linear4bit()
+    model.wrapper = torch.nn.Module()
+    model.wrapper.down_proj_extra = Linear4bit()
+
+    counts = validate_lora_target_modules(model, sorted(sft._ALLOWED_TARGET_MODULES))
+
+    assert counts == {target: 1 for target in sorted(sft._ALLOWED_TARGET_MODULES)}
 
 
 class TinyAdapter(torch.nn.Module):

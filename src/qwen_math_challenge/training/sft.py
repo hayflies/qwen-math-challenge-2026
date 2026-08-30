@@ -944,14 +944,11 @@ class AssistantOnlyDataCollator:
 def validate_lora_target_modules(model: Any, targets: Sequence[str]) -> dict[str, int]:
     """Confirm configured targets against the instantiated Qwen2 architecture."""
 
-    counts = {
-        target: sum(
-            name == target or name.endswith(f".{target}")
-            for name, module in model.named_modules()
-            if module.__class__.__name__ == "Linear"
-        )
-        for target in targets
-    }
+    counts = {target: 0 for target in targets}
+    for name, _module in model.named_modules():
+        terminal_name = name.rsplit(".", maxsplit=1)[-1]
+        if terminal_name in counts:
+            counts[terminal_name] += 1
     missing = sorted(target for target, count in counts.items() if count == 0)
     if missing:
         raise SFTError(f"LoRA target modules are absent from this model: {missing}")

@@ -378,6 +378,10 @@ def _ordered_identity(values: Sequence[str]) -> str:
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
 
+def _normalize_line_endings(value: str) -> str:
+    return value.replace("\r\n", "\n").replace("\r", "\n")
+
+
 def load_final_input(settings: FinalDataSettings) -> FinalInputBundle:
     """Validate both official files while retaining all 2,000 rows in order."""
 
@@ -414,7 +418,9 @@ def load_final_input(settings: FinalDataSettings) -> FinalInputBundle:
             raise FinalSubmissionError(f"Test flags have duplicate id {row['id']!r}.")
         if row["id"] not in question_by_id:
             raise FinalSubmissionError(f"Flagged id {row['id']!r} is absent from final test.")
-        if question_by_id[row["id"]] != row["question"]:
+        if _normalize_line_endings(question_by_id[row["id"]]) != _normalize_line_endings(
+            row["question"]
+        ):
             raise FinalSubmissionError(
                 f"Flagged question for {row['id']!r} does not match final test exactly."
             )

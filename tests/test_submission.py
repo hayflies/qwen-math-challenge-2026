@@ -153,6 +153,35 @@ def test_flag_question_must_match_official_test_exactly(tmp_path: Path) -> None:
         load_final_input(settings.data)
 
 
+def test_flag_question_comparison_normalizes_only_line_endings(tmp_path: Path) -> None:
+    _, settings = _settings(tmp_path)
+    _write_csv(
+        settings.data.test_path,
+        ["id", "question", "answer"],
+        [
+            ["test-1", "Question one", ""],
+            ["test-2", "Line one\nLine two", ""],
+            ["test-3", "Question three", ""],
+        ],
+    )
+    _write_csv(
+        settings.data.flag_path,
+        ["id", "question"],
+        [["test-2", "Line one\r\nLine two"]],
+    )
+
+    bundle = load_final_input(settings.data)
+    assert bundle.rows[1].question == "Line one\nLine two"
+
+    _write_csv(
+        settings.data.flag_path,
+        ["id", "question"],
+        [["test-2", "Line one\r\nDifferent"]],
+    )
+    with pytest.raises(FinalSubmissionError, match="does not match"):
+        load_final_input(settings.data)
+
+
 def test_nonempty_template_answer_is_rejected(tmp_path: Path) -> None:
     _, settings = _settings(tmp_path)
     _write_csv(

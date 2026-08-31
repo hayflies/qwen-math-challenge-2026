@@ -1,0 +1,26 @@
+{
+  "flagged_rows_included": true,
+  "flags": {
+    "columns": [
+      "id",
+      "question"
+    ],
+    "filename": "test_flag.csv",
+    "ordered_id_sha256": "2ff9bc06b6b21c1ab04a83591c832a02a4ce60686d3bd0536e9eb050d04bbc3d",
+    "rows": 120,
+    "sha256": "3598f051c50dd36e06cf8dc8e541c1f486f83228d26e7ce238e450d7058f74bd"
+  },
+  "schema_version": 1,
+  "scoring_eligible_rows": 1880,
+  "test": {
+    "columns": [
+      "id",
+      "question",
+      "answer"
+    ],
+    "filename": "test_submission.csv",
+    "ordered_id_sha256": "e2e3af1694c28a5935192ac2705f2bd75f7a3fb7293510be85d8fd2a9995c54f",
+    "rows": 2000,
+    "sha256": "106358e4d0365b72c387a9d31f233d52e9122b8547c3cd8d076cf25f39295f9b"
+  }
+}

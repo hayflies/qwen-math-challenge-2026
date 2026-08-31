@@ -1,0 +1,70 @@
+{
+  "identity": {
+    "adapter": null,
+    "canonical_e000_config_sha256": "f2d6d851d263466ee32fbdeabf70be326a0ff5a63f1e63e0376bf7bc10daaaea",
+    "chat_template_sha256": "cd8e9439f0570856fd70470bf8889ebd8b5d1107207f67a5efb46e342330527f",
+    "code_sha256": {
+      "shards.py": "3d33171883f18ade726bd9a6bb604b258d8f7c7b03de1a720f5fc7bc79a3dbbe",
+      "submission.py": "73e106416e1c0c2c8d293d0248eb92db3ca9cf347546dc3b07094b158640ef4e",
+      "zero_shot.py": "86d37df1b7afc60c1299813f66c3474d2014126ca92377ff2fc980d1a58c4916"
+    },
+    "config_sha256": "60517b11d3bfc69a069b833f7d2ea934f97513ed19979300e9be481895da6b4d",
+    "external_datasets": [],
+    "generation": {
+      "do_sample": false,
+      "max_new_tokens": 1024,
+      "num_beams": 1,
+      "use_cache": true,
+      "version": "greedy_v001"
+    },
+    "input_identity": {
+      "flagged_rows_included": true,
+      "flags": {
+        "columns": [
+          "id",
+          "question"
+        ],
+        "filename": "test_flag.csv",
+        "ordered_id_sha256": "2ff9bc06b6b21c1ab04a83591c832a02a4ce60686d3bd0536e9eb050d04bbc3d",
+        "rows": 120,
+        "sha256": "3598f051c50dd36e06cf8dc8e541c1f486f83228d26e7ce238e450d7058f74bd"
+      },
+      "schema_version": 1,
+      "scoring_eligible_rows": 1880,
+      "test": {
+        "columns": [
+          "id",
+          "question",
+          "answer"
+        ],
+        "filename": "test_submission.csv",
+        "ordered_id_sha256": "e2e3af1694c28a5935192ac2705f2bd75f7a3fb7293510be85d8fd2a9995c54f",
+        "rows": 2000,
+        "sha256": "106358e4d0365b72c387a9d31f233d52e9122b8547c3cd8d076cf25f39295f9b"
+      }
+    },
+    "model_commit": "aa8e72537993ba99e69dfaafa59ed015b17504d1",
+    "model_name": "Qwen/Qwen2.5-3B-Instruct",
+    "model_revision": "aa8e72537993ba99e69dfaafa59ed015b17504d1",
+    "parser_version": "integer_v002_last_explicit_on_conflict",
+    "pipeline_version": "phase13_final_e000_shard_v1",
+    "prompt": {
+      "system_text": "You solve math problems. End your response with the final answer as an integer.",
+      "user_template": "{question}\n\nSolve the problem and end with: Final answer: <integer>",
+      "version": "zero_shot_v001"
+    },
+    "schema_version": 1,
+    "shard": {
+      "excluded_completed_count": 989,
+      "excluded_predictions_sha256": "ea421f1d01bbc0c71f08184ebf9980f66d28010625bc5d4e157fdbdad0cdfdbf",
+      "index": 0,
+      "num_shards": 2,
+      "selected_count": 506,
+      "selected_ordered_id_sha256": "34a398889394b8564d4f5d0537bb5c318110b1b16fded3cf56007386d92e90d3"
+    },
+    "tokenizer_commit": "aa8e72537993ba99e69dfaafa59ed015b17504d1",
+    "tokenizer_revision": "aa8e72537993ba99e69dfaafa59ed015b17504d1",
+    "tool_use": false
+  },
+  "identity_sha256": "f8bcfe2668211f107463564df1732d80283d4da97702ec30435f8fb535c7f0de"
+}

@@ -14,6 +14,7 @@ htmlcov/
 .idea/
 .vscode/
 .DS_Store
+.ipynb_checkpoints/
 
 # Secrets and local-only configuration
 .env
@@ -21,6 +22,8 @@ htmlcov/
 !.env.example
 *.pem
 *.key
+/kaggle.json
+/.netrc
 
 # Official files currently supplied at the repository root
 /deep_chal_math_train.csv
@@ -28,6 +31,11 @@ htmlcov/
 /train_filtered_ids.csv
 /deep_chal_math_dataset_test.csv
 /deep_chal_math_test.csv
+/test_submission.csv
+/test_flag.csv
+/submission.csv
+/submission.csv.sha256
+/submission.sha256
 
 # Raw and externally downloaded datasets are never committed
 /data/raw/**
@@ -59,3 +67,30 @@ htmlcov/
 *.pth
 pytorch_model*.bin
 adapter_model*.bin
+/.cache/
+/.huggingface/
+/huggingface/
+/models/
+/FINAL_E000_PARTIAL_*_RESUME.tar.gz
+/shard*.log
+/nohup.out
+
+# Canonical payloads remain local; track only the exact-reproduction layout guide.
+/artifacts/**
+!/artifacts/final_submission/
+!/artifacts/final_submission/README.md
+!/artifacts/final_submission/partial_989/
+!/artifacts/final_submission/partial_989/predictions.csv
+!/artifacts/final_submission/partial_989/input_identity.json
+!/artifacts/final_submission/partial_989/resume_identity.json
+!/artifacts/final_submission/partial_989/run_manifest.json
+!/artifacts/final_submission/shard_0/
+!/artifacts/final_submission/shard_0/predictions.csv
+!/artifacts/final_submission/shard_0/input_identity.json
+!/artifacts/final_submission/shard_0/resume_identity.json
+!/artifacts/final_submission/shard_0/run_manifest.json
+!/artifacts/final_submission/shard_1/
+!/artifacts/final_submission/shard_1/predictions.csv
+!/artifacts/final_submission/shard_1/input_identity.json
+!/artifacts/final_submission/shard_1/resume_identity.json
+!/artifacts/final_submission/shard_1/run_manifest.json

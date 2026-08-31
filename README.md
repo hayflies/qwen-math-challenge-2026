@@ -1,149 +1,177 @@
 # Qwen Math Challenge 2026
 
-`Qwen/Qwen2.5-3B-Instruct`를 출발점으로 수학 문제 해결 모델을 개발하기 위한
-재현 가능한 실험 저장소다. 대회 규칙, 데이터 정책, 금지사항, Phase Gate의 최상위
-기준은 루트의 `AGENTS.md`다.
+Reproducible training, evaluation, and final-inference code for the 2026 아주 소중한 딥러닝
+챌린지. The organizer-mandated base model is
+[`Qwen/Qwen2.5-3B-Instruct`](https://huggingface.co/Qwen/Qwen2.5-3B-Instruct), fixed at
+revision `aa8e72537993ba99e69dfaafa59ed015b17504d1`. Repository rules, data policy, and
+phase gates are defined in [`AGENTS.md`](AGENTS.md).
 
-현재 구현 범위는 **Phase 0 — 프로젝트 기반 및 재현성**, **Phase 1 — 공식 데이터 감사 및
-정제**, **Phase 2 — leakage-safe 내부 validation 구축**, **Phase 3 — E000 zero-shot
-평가**, **Phase 4 — E001 official-only direct-answer SFT 실행 준비**다. E001의 실제 CUDA
-smoke, full training과 full validation 평가는 아직 pending이다.
+## Final submission
 
-## 환경 준비
+The submitted system was the **E000 base-model inference pipeline**, not the E001 fine-tuned
+adapter. It used the frozen `zero_shot_v001` chat prompt, greedy decoding with
+`max_new_tokens=1024`, and parser
+`integer_v002_last_explicit_on_conflict`. No external answer lookup, API, solver, calculator,
+or inference-time code execution was used.
 
-Python 3.11과 `uv`를 사용한다. 직접 의존성의 허용 범위는 `pyproject.toml`, 실제 설치
-버전과 전이 의존성은 `uv.lock`이 고정한다.
+Under the final-day deadline, the submitted CSV combined:
+
+- 989 predictions from the original interrupted E000 run;
+- 382 completed predictions from emergency shard 0;
+- 332 completed predictions from emergency shard 1;
+- 297 missing answers filled with the unique mode (`2`) of the 1,703 parsed model predictions.
+
+All 2,000 official rows remained in their original order, including all 120 organizer-flagged
+rows. The final submitted file has SHA-256:
+
+```text
+1ff78693423e011464f3bcb6f334eb8e181b192be92919a718831e9fc292d538
+```
+
+E001 was an official-only direct-answer QLoRA experiment. It reduced internal validation
+accuracy from E000's `65.67%` to `22.91%` and was **not** used for the final submission. E001
+weights are not needed to reproduce the submitted answers.
+
+## Environment and setup
+
+- Python: `>=3.11,<3.12` (development and Kaggle runs used Python 3.11)
+- Package manager: `uv`; exact transitive versions are locked in `uv.lock`
+- Main libraries: PyTorch, Transformers, Accelerate, PEFT, bitsandbytes, NumPy, PyYAML
+- Final inference hardware: Kaggle NVIDIA T4; emergency completion used two independent T4
+  processes, each seeing one GPU
+- Inference is offline: the exact model snapshot must already exist in the Hugging Face cache
+  because `local_files_only: true` is frozen in the config
 
 ```bash
+git clone <PUBLIC_GITHUB_REPOSITORY_URL>
+cd qwen-math-challenge-2026
+python -m pip install uv==0.12.6
 uv sync --frozen --group dev
+uv run --frozen --no-sync pytest -q
 ```
 
-Phase 4 E001은 QLoRA에 실제 필요한 PEFT와 bitsandbytes를 추가한다. TRL, datasets,
-DeepSpeed는 사용하지 않는다.
+Do not commit Hugging Face tokens, Kaggle credentials, official raw data, model caches, or model
+weights. The base-model license and access terms are provided by its Hugging Face repository.
 
-## 검증
+## Mode A: reproduce the model-inference pipeline
+
+Place the organizer-provided `test_submission.csv` and `test_flag.csv` outside Git, make the
+exact model revision available in the local Hugging Face cache, then run one visible GPU:
 
 ```bash
-uv run --frozen ruff check src scripts tests
-uv run --frozen pytest -q
-uv run --frozen python scripts/phase0_smoke.py \
-  --config configs/phase0/smoke.yaml
+CUDA_VISIBLE_DEVICES=0 uv run --frozen --no-sync python scripts/generate_submission.py \
+  --config configs/inference/e000_final_submission.yaml \
+  --test-file /path/to/test_submission.csv \
+  --flag-file /path/to/test_flag.csv
 ```
 
-smoke 실행은 `outputs/<experiment_id>/<run_id>/`에 다음을 저장한다.
+This runs E000 on all 2,000 questions and reproduces the **pipeline**. It is not expected to
+produce the deadline submission byte-for-byte because that artifact contains 297 deterministic
+fallback rows.
 
-- 실행 config 원본 snapshot과 SHA-256
-- Git branch/commit/dirty 상태
-- Python, 주요 패키지, PyTorch, CUDA, MPS, GPU 환경 정보
-- run manifest, log, deterministic probe 결과
+### Crash-safe resume
 
-Git에 아직 커밋이 없으면 오류를 내지 않고 `git_commit: null`,
-`git_head_state: unborn`으로 기록한다.
-
-## 데이터 안전 정책
-
-- 공식 raw 파일은 직접 수정하지 않는다.
-- raw와 외부 데이터는 Git에 commit하지 않는다.
-- 파생 데이터는 `data/processed/` 또는 `data/splits/`에 versioning한다.
-- 현재 루트에 제공된 공식 CSV는 Phase 0에서 이동하거나 변경하지 않는다.
-- leaderboard/test 데이터는 어떤 training 입력에도 연결하지 않는다.
-
-자세한 디렉터리 정책은 `data/README.md`를 참고한다.
-
-## Phase 1 공식 데이터 준비
-
-공식 파일은 `data/raw/official_v001/`에 원본 바이트 그대로 보관한다. 다음 명령은 raw
-hash와 schema를 검증하고, 공식 오류 ID 627개를 오직 `id` 기준으로 제거한다.
+The runner fsyncs every prediction and resumes only after config, model, tokenizer, prompt,
+generation, parser, input, and code identities match:
 
 ```bash
-uv run --frozen python scripts/inspect_data.py \
-  --config configs/data/official_v001.yaml
+CUDA_VISIBLE_DEVICES=0 uv run --frozen --no-sync python scripts/generate_submission.py \
+  --config configs/inference/e000_final_submission.yaml \
+  --test-file /path/to/test_submission.csv \
+  --flag-file /path/to/test_flag.csv \
+  --resume /path/to/prior/run
 ```
 
-산출물은 `data/processed/official_v001/`에 생성된다.
+### Emergency two-GPU sharding
 
-- `train_clean.csv`: 공식 627개 ID만 제거한 clean train
-- `audit_report.json`: schema, 통계, 교차검사, suspect reporting
-- `dataset_manifest.json`: raw-to-clean provenance와 hash
-
-커뮤니티 candidate exclusion은 현재 파일이 없으므로 적용하지 않는다. 향후 별도 dataset
-variant에서 검증하고 ablation한다.
-
-## Phase 2 내부 validation 생성
-
-다음 명령은 `official_v001` clean train의 hash와 16,373행 invariant를 확인한 뒤 보수적
-정규화, text-only near-duplicate blocking/유사도 평가, 연결요소 grouping, seed 2026의
-group-safe 약 10% split을 순서대로 실행한다.
+Plan by completed-ID membership, never by an assumed row prefix:
 
 ```bash
-uv run --frozen python scripts/create_split.py \
-  --config configs/data/split_official_v001.yaml
+uv run --frozen --no-sync python scripts/manage_final_shards.py plan \
+  --config configs/inference/e000_final_submission.yaml \
+  --test-file /path/to/test_submission.csv \
+  --flag-file /path/to/test_flag.csv \
+  --existing-run /path/to/original/partial-run \
+  --num-shards 2
 ```
 
-산출물은 `data/splits/official_v001/`에 생성된다. `train.csv`, `val.csv`, `groups.csv`,
-`near_duplicate_candidates.csv`는 대용량 payload로 Git에서 제외하고, 재현에 필요한
-`split_manifest.json`과 `split_report.json`은 추적한다. leaderboard는 exact/normalized
-overlap 감사에만 읽으며 train/validation에는 포함하지 않는다. derived category는 gold
-label이 아니므로 보고에만 사용하고 split 기준으로 사용하지 않는다.
-
-## Phase 3 E000 zero-shot 평가
-
-E000은 `Qwen/Qwen2.5-3B-Instruct`의 로컬 Hugging Face cache만 사용한다. 모델을 다른
-checkpoint로 대체하거나 실행 중 자동 다운로드하지 않는다. 다음 명령으로 5문항 smoke를 먼저
-실행한다.
+Launch two independent background processes (no DataParallel or distributed training):
 
 ```bash
-uv run --frozen --no-sync python scripts/evaluate_zero_shot.py \
-  --config configs/inference/e000_zero_shot.yaml \
-  --limit 5
+CUDA_VISIBLE_DEVICES=0 nohup uv run --frozen --no-sync python scripts/generate_submission.py \
+  --config configs/inference/e000_final_submission.yaml \
+  --test-file /path/to/test_submission.csv \
+  --flag-file /path/to/test_flag.csv \
+  --exclude-run /path/to/original/partial-run --shard-index 0 --num-shards 2 \
+  > shard0.log 2>&1 &
+
+CUDA_VISIBLE_DEVICES=1 nohup uv run --frozen --no-sync python scripts/generate_submission.py \
+  --config configs/inference/e000_final_submission.yaml \
+  --test-file /path/to/test_submission.csv \
+  --flag-file /path/to/test_flag.csv \
+  --exclude-run /path/to/original/partial-run --shard-index 1 --num-shards 2 \
+  > shard1.log 2>&1 &
 ```
 
-전체 validation은 `--limit`을 제거한다. 중단된 호환 run의 완료 prefix를 재사용하려면 새
-run을 만들면서 `--resume <prior-run-directory>`를 지정한다. model commit, split hash,
-prompt, generation config, parser, limit 또는 config hash가 다르면 resume을 거부한다.
+`scripts/manage_final_shards.py merge` accepts only complete, disjoint planned shards. The exact
+deadline artifact instead uses the separate Mode B path below because both emergency shards were
+still partial at submission time.
 
-기본값은 공식 tokenizer chat template, greedy decoding, `max_new_tokens=1024`, batch size
-1이다. 출력에는 token/latency, finish reason, truncation, raw generation과 parser 결과를 함께
-보존한다. 문제 풀이용 Python/SymPy/calculator/tool은 사용하지 않는다.
+## Mode B: reproduce the exact submitted CSV
 
-### Phase 3 동결 상태
-
-Phase 3 Gate는 Kaggle CUDA에서 완료한 canonical full E000을 근거로 **PASS**다. 고정
-validation 1,637문항에서 1,075문항을 맞혀 Accuracy `0.6566890654`를 기록했고 parse
-failure는 6건이다. 최종 run은 호환성 검사를 통과한 completed prefix에서 resume했으며,
-78건이 `max_new_tokens=1024`에 도달했다. 설정을 소급 변경하거나 재측정하지 않는다.
-
-정확한 identity, metric, artifact 보존 위치, 로컬 검증 범위와 후속 분석 TODO는
-[`experiments/e000_zero_shot.yaml`](experiments/e000_zero_shot.yaml)에 동결한다. canonical
-archive는 Kaggle Notebook Version 1 Output에 보존되어 있고, repository root의 import본도
-기대 SHA-256, 내부 artifact hash, identity와 1,637행 metric integrity 검증을 통과했다. 검증 및
-사후분석 결과는 [`analysis/e000/analysis_manifest.json`](analysis/e000/analysis_manifest.json)에
-기록한다. 기존 MPS 1문항/5문항 결과는 pre-CUDA smoke evidence로 `outputs/`에 그대로
-유지하며 canonical full metric으로 사용하지 않는다.
-
-Canonical archive를 재검증하고 동일 분석 산출물을 만들려면 다음을 실행한다.
+The 12 small frozen Kaggle files required for exact reconstruction are versioned under
+`artifacts/final_submission/` as described in its
+[`README.md`](artifacts/final_submission/README.md). The script fails closed if any file, source
+identity, parser result, shard prefix, row count, flag set, or final checksum differs.
 
 ```bash
-uv run --frozen --no-sync python scripts/analyze_e000.py \
-  --archive E000_20260828_canonical_artifacts.tar.gz \
-  --output-dir analysis/e000
+uv run --frozen --no-sync python scripts/reproduce_final_submission.py \
+  --config configs/inference/e000_final_submission.yaml \
+  --test-file /path/to/test_submission.csv \
+  --flag-file /path/to/test_flag.csv \
+  --artifact-dir artifacts/final_submission \
+  --output-dir outputs/final_submission_reproduced
 ```
 
-## Phase 4 E001 direct-answer QLoRA
+This CPU-only command writes `submission.csv`, `submission.csv.sha256`, and
+`reproduction_manifest.json`. Answers are parsed with Python arbitrary-precision integers; no
+`int64` conversion is used. Success requires the fixed SHA-256 shown above.
 
-E001은 오직 `official_v001_split_v001`의 14,736개 train row를 사용하고, assistant target을
-canonical integer와 EOS로만 구성한다. E000의 `zero_shot_v001` prompt와
-`greedy_v001`/`integer_v001` 평가 설정을 그대로 유지한다. 전체 tokenizer audit 결과 최대
-길이는 1,131 token이므로 `max_seq_length=1152`에서 truncation은 0건이다.
+## Integrity and reproducibility identities
 
-로컬 preflight는 모델 weight나 CUDA 없이 실행할 수 있다.
+- Kaggle emergency sharding code commit:
+  `d7adc8961a65e0354e4089ef525bf63646f8c665`
+- Final config: `configs/inference/e000_final_submission.yaml`
+- Final config SHA-256:
+  `60517b11d3bfc69a069b833f7d2ea934f97513ed19979300e9be481895da6b4d`
+- Canonical E000 reference config SHA-256:
+  `f2d6d851d263466ee32fbdeabf70be326a0ff5a63f1e63e0376bf7bc10daaaea`
+- Base model/tokenizer revision:
+  `aa8e72537993ba99e69dfaafa59ed015b17504d1`
+- Submitted CSV SHA-256:
+  `1ff78693423e011464f3bcb6f334eb8e181b192be92919a718831e9fc292d538`
 
-```bash
-uv run --frozen --no-sync python scripts/train_sft.py \
-  --config configs/sft/e001_official_direct_answer.yaml \
-  --validate-only
+Run manifests record config, Git, environment, input, parser, and model identities. Derived data
+and canonical experiment artifacts remain versioned separately; raw organizer data is immutable
+and excluded from Git.
+
+## Repository structure
+
+```text
+configs/       Frozen data, training, evaluation, and inference YAML configs
+src/           Reusable data, training, evaluation, inference, and reproducibility logic
+scripts/       CLI entry points
+tests/         CPU/unit tests and guarded GPU integration paths
+experiments/   Canonical experiment records
+analysis/      Versioned E000 post-analysis summaries
+docs/          Kaggle execution documentation
+artifacts/     Frozen final predictions/provenance; large model/experiment payloads stay local
+outputs/       Ignored run directories and generated submissions
 ```
 
-Tesla T4 smoke, full training, adapter 평가와 artifact 동결의 정확한 순서는
-[`docs/kaggle_e001.md`](docs/kaggle_e001.md)를 따른다. 다른 hyperparameter, external data,
-reasoning augmentation, parser/prompt/generation 변경은 E001에 섞지 않는다.
+## Model and weights statement
+
+The final submitted inference path uses the organizer-specified
+`Qwen/Qwen2.5-3B-Instruct` base weights at the exact revision above and loads no LoRA or other
+fine-tuned adapter. Therefore there are no fine-tuned weights required for final-submission
+reproduction; model-inference reproduction requires only the official base-model snapshot.

@@ -23,6 +23,7 @@ from qwen_math_challenge.data.official import sha256_file
 
 ALLOWED_MODEL_ID = "Qwen/Qwen2.5-3B-Instruct"
 ANSWER_PARSER_VERSION = "integer_v001"
+ANSWER_PARSER_V2_VERSION = "integer_v002_last_explicit_on_conflict"
 PIPELINE_VERSION = "phase3_e000_v2"
 PREDICTION_COLUMNS = (
     "id",
@@ -495,6 +496,32 @@ def parse_integer_answer(raw_output: str) -> ParseResult:
             match.group(0),
         )
     return ParseResult(None, "parse_failure_no_integer", None)
+
+
+def parse_integer_answer_v2(raw_output: str) -> ParseResult:
+    """Resolve only v1 conflicts by selecting the last explicit/boxed integer.
+
+    Every successful ``integer_v001`` result is returned unchanged. The new
+    policy is deliberately limited to ``parse_failure_conflict`` so canonical
+    E000 behavior cannot change for previously parsed rows.
+    """
+
+    result = parse_integer_answer(raw_output)
+    if result.status != "parse_failure_conflict":
+        return result
+
+    candidates: list[re.Match[str]] = [
+        *_BOXED_INTEGER_PATTERN.finditer(raw_output),
+        *_EXPLICIT_INTEGER_PATTERN.finditer(raw_output),
+    ]
+    if not candidates:  # Defensive: a v1 conflict necessarily has these matches.
+        return result
+    match = max(candidates, key=lambda candidate: (candidate.start(), candidate.end()))
+    return ParseResult(
+        _canonical_integer(match.group("value")),
+        "parsed_conflict_last_explicit_v002",
+        match.group(0),
+    )
 
 
 def integer_exact_match(prediction: int | None, gold: int) -> bool:

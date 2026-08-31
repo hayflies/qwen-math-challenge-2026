@@ -1,0 +1,83 @@
+schema_version: 1
+
+experiment:
+  experiment_id: FINAL_E000
+  phase: 13
+  model: Qwen/Qwen2.5-3B-Instruct
+  checkpoint: Qwen/Qwen2.5-3B-Instruct@aa8e72537993ba99e69dfaafa59ed015b17504d1
+  dataset_version: final_test_20260831
+  train_samples: 0
+  validation_split: null
+  external_datasets: []
+  seed: 2026
+  learning_rate: null
+  epochs: null
+  batch_size: 1
+  gradient_accumulation: null
+  max_length: null
+  lora_config: null
+  prompt_template: zero_shot_v001
+  inference_config: greedy_v001
+  parser_version: integer_v002_last_explicit_on_conflict
+  local_validation_score: 0.6591325596
+  per_category_scores: {}
+  leaderboard_score: null
+  notes: >-
+    Submission-only E000 final-test inference. Includes all 2000 rows, including the
+    120 organizer-flagged rows; no adapter, external answer lookup, API, or tool use.
+
+runtime:
+  output_root: outputs/final_e000
+  log_level: INFO
+  deterministic: true
+  device: auto
+  dtype: auto
+  batch_size: 1
+
+model:
+  name_or_path: Qwen/Qwen2.5-3B-Instruct
+  revision: aa8e72537993ba99e69dfaafa59ed015b17504d1
+  tokenizer_revision: aa8e72537993ba99e69dfaafa59ed015b17504d1
+  local_files_only: true
+  trust_remote_code: false
+
+data:
+  test_path: test_submission.csv
+  expected_rows: 2000
+  columns: [id, question, answer]
+  flag_path: test_flag.csv
+  expected_flag_rows: 120
+  flag_columns: [id, question]
+
+prompt:
+  version: zero_shot_v001
+  system_text: >-
+    You solve math problems. End your response with the final answer as an integer.
+  user_template: |-
+    {question}
+
+    Solve the problem and end with: Final answer: <integer>
+
+generation:
+  version: greedy_v001
+  do_sample: false
+  num_beams: 1
+  max_new_tokens: 1024
+  use_cache: true
+
+parser:
+  version: integer_v002_last_explicit_on_conflict
+  base_version: integer_v001
+  conflict_policy: last_explicit_or_boxed_by_position
+
+canonical_e000:
+  reference_config_path: configs/inference/e000_zero_shot.yaml
+  reference_config_sha256: f2d6d851d263466ee32fbdeabf70be326a0ff5a63f1e63e0376bf7bc10daaaea
+
+output:
+  predictions_filename: predictions.csv
+  resume_identity_filename: resume_identity.json
+  input_identity_filename: input_identity.json
+  metrics_filename: metrics.json
+  submission_filename: submission.csv
+  submission_sha256_filename: submission.sha256

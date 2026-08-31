@@ -20,6 +20,7 @@ from qwen_math_challenge.evaluation.zero_shot import (
     load_validation_rows,
     load_zero_shot_settings,
     parse_integer_answer,
+    parse_integer_answer_v2,
     render_chat_prompt,
     run_zero_shot_evaluation,
     select_device,
@@ -239,6 +240,62 @@ def test_conflicting_answer_patterns_fail() -> None:
     result = parse_integer_answer(r"Final answer: 41, but \boxed{42}")
     assert result.value is None
     assert result.status == "parse_failure_conflict"
+
+
+@pytest.mark.parametrize(
+    ("raw", "expected"),
+    [
+        ("Final answer: 2\nFinal answer: -4", -4),
+        (r"First: \boxed{25}. Second: \boxed{-7}.", -7),
+        ("Final answer: 4781\nFinal answer: 1", 1),
+        ("Final answer: -6\nFinal answer: 5", 5),
+        ("Final answer: 74\nFinal answer: 150", 150),
+        (r"\boxed{24}, then \boxed{14}, finally \boxed{256}", 256),
+    ],
+)
+def test_parser_v2_covers_six_canonical_e000_conflict_shapes(raw: str, expected: int) -> None:
+    assert parse_integer_answer(raw).status == "parse_failure_conflict"
+    result = parse_integer_answer_v2(raw)
+    assert result.value == expected
+    assert result.status == "parsed_conflict_last_explicit_v002"
+
+
+@pytest.mark.parametrize(
+    "raw",
+    [
+        "42",
+        "-17",
+        "0",
+        r"After reasoning, \boxed{-1,234}",
+        "We used 3 and 7. Final answer: 21",
+        "No integer here.",
+        "42.0",
+        "6*7",
+        "",
+    ],
+)
+def test_parser_v2_is_identical_for_every_non_conflict_v1_result(raw: str) -> None:
+    v1 = parse_integer_answer(raw)
+    assert v1.status != "parse_failure_conflict"
+    assert parse_integer_answer_v2(raw) == v1
+
+
+def test_parser_v2_expected_canonical_e000_score_and_no_regression() -> None:
+    conflicts = [
+        ("Final answer: 2\nFinal answer: -4", -4),
+        (r"First: \boxed{25}. Second: \boxed{-7}.", 81),
+        ("Final answer: 4781\nFinal answer: 1", 1),
+        ("Final answer: -6\nFinal answer: 5", 5),
+        ("Final answer: 74\nFinal answer: 150", 150),
+        (r"\boxed{24}, then \boxed{14}, finally \boxed{256}", 283),
+    ]
+    recovered = sum(parse_integer_answer_v2(raw).value == gold for raw, gold in conflicts)
+
+    assert recovered == 4
+    assert 1075 + recovered == 1079
+    # The v2 function returns v1's object unchanged unless v1 reported a conflict.
+    successful_v1 = ["42", "Final answer: -17", r"Reasoning. \boxed{0}"]
+    assert all(parse_integer_answer_v2(raw) == parse_integer_answer(raw) for raw in successful_v1)
 
 
 def test_integer_exact_match_scoring() -> None:

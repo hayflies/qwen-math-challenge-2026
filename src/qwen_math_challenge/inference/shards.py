@@ -26,6 +26,7 @@ from qwen_math_challenge.inference.submission import (
     _load_resume,
     _metrics,
     _ordered_identity,
+    _source_hashes,
     _write_and_validate_submission,
     _write_predictions,
     load_final_input,
@@ -206,8 +207,8 @@ def _shard_resume_identity(
         "pipeline_version": SHARD_PIPELINE_VERSION,
         "config_sha256": config.source_sha256,
         "code_sha256": {
+            **_source_hashes(),
             "shards.py": sha256_file(Path(__file__).resolve()),
-            "submission.py": sha256_file(Path(__file__).with_name("submission.py").resolve()),
         },
         "input_identity": plan.bundle.identity,
         "model_name": settings.model.name_or_path,
